@@ -1,0 +1,9 @@
+# Root context for web image — keep build context small
+frontend/node_modules
+frontend/.next
+frontend/out
+frontend/.git
+backend/bin
+**/.git
+**/*.md
+.cursor

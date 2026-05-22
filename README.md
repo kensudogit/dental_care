@@ -79,6 +79,39 @@ query {
 | `PORT` | `8080` | Go API |
 | `API_URL` | `http://localhost:8080` | Next.js サーバー側 GraphQL URL |
 
+## Docker（ローカル）
+
+```bash
+docker compose build
+docker compose up
+```
+
+Web イメージのビルドコンテキストは **リポジトリルート** です（`graphql/schema.graphql` を Codegen が参照するため）。
+
+## Railway（本番）
+
+**起動コマンドに `docker-compose.yml` は使いません。** API / Web の **2サービス** でデプロイします。
+
+| サービス | Root Directory | Config file |
+|----------|----------------|-------------|
+| API | `backend` | `/backend/railway.toml` |
+| Web | `.`（リポジトリルート） | `/railway.toml` |
+
+Web の必須変数:
+
+```env
+API_URL=https://<api-service>.up.railway.app
+```
+
+詳細: [docs/RAILWAY.md](docs/RAILWAY.md)
+
+本番向け Compose テンプレート:
+
+```bash
+cp .env.railway.example .env.railway
+docker compose -f docker-compose.railway.yml --env-file .env.railway up --build
+```
+
 ## 今後
 
 - gqlgen への移行（Go 側 codegen）

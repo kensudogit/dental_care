@@ -1,0 +1,98 @@
+"""歯科医療DX — GraphQL API (Single Source of Truth)"""
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Health {
+  ok: Boolean!
+  service: String!
+  version: String!
+}
+
+type DashboardStats {
+  patientsTotal: Int!
+  appointmentsToday: Int!
+  treatmentsThisMonth: Int!
+  revenueThisMonth: Int!
+  chairUtilization: Float!
+  noShowRate: Float!
+}
+
+type Patient {
+  id: ID!
+  chartNo: String!
+  name: String!
+  kana: String!
+  birthDate: String!
+  phone: String!
+  email: String!
+  allergies: String!
+  notes: String!
+  lastVisit: String!
+  createdAt: String!
+}
+
+input CreatePatientInput {
+  chartNo: String
+  name: String!
+  kana: String
+  birthDate: String
+  phone: String
+  email: String
+  allergies: String
+  notes: String
+  lastVisit: String
+}
+
+type Appointment {
+  id: ID!
+  patientId: ID!
+  patientName: String
+  chair: Int!
+  startAt: String!
+  endAt: String!
+  type: String!
+  status: String!
+  staff: String!
+  notes: String!
+}
+
+input CreateAppointmentInput {
+  patientId: ID!
+  chair: Int!
+  startAt: String!
+  endAt: String!
+  type: String!
+  status: String
+  staff: String!
+  notes: String
+}
+
+type TreatmentRecord {
+  id: ID!
+  patientId: ID!
+  patientName: String
+  visitDate: String!
+  tooth: String!
+  procedure: String!
+  diagnosis: String!
+  fee: Int!
+  staff: String!
+  status: String!
+  tags: [String!]!
+}
+
+type Query {
+  health: Health!
+  dashboard: DashboardStats!
+  patients: [Patient!]!
+  patient(id: ID!): Patient
+  appointments(date: String): [Appointment!]!
+  treatments(patientId: ID): [TreatmentRecord!]!
+}
+
+type Mutation {
+  createPatient(input: CreatePatientInput!): Patient!
+  createAppointment(input: CreateAppointmentInput!): Appointment!
+}

@@ -1,0 +1,135 @@
+# Railway デプロイ手順（DentalCare DX）
+
+このリポジトリは **API（Go）** と **Web（Next.js）** の **2サービス** でデプロイします。
+
+`docker-compose.yml` を起動コマンドに指定する必要は **ありません**。
+
+## 1. リポジトリを接続
+
+1. [Railway](https://railway.com) で New Project → Deploy from GitHub
+2. 本リポジトリ `dental_care` を選択
+
+## 2. API サービス（Go）
+
+| 設定 | 値 |
+|------|-----|
+| サービス名 | `api`（任意。Web から参照する名前） |
+| **Root Directory** | `backend` |
+| **Config file path** | `/backend/railway.toml` |
+| Builder | Dockerfile（`backend/Dockerfile`） |
+
+**Variables**
+
+| 変数 | 必須 | 説明 |
+|------|------|------|
+| `PORT` | 自動 | Railway が注入。通常は手動設定不要 |
+
+**Networking**
+
+- Generate Domain を有効化
+- 例: `https://dental-care-api-production.up.railway.app`
+- 動作確認: `GET /health` → `{"ok":true,...}`
+
+**Watch Paths（推奨）**
+
+```
+backend/**
+```
+
+## 3. Web サービス（Next.js）
+
+| 設定 | 値 |
+|------|-----|
+| **Root Directory** | `.`（リポジトリルート） |
+| **Config file path** | `/railway.toml` |
+| Dockerfile | `frontend/Dockerfile`（`railway.toml` で指定済み） |
+
+**Variables（重要）**
+
+| 変数 | 必須 | 値の例 |
+|------|------|--------|
+| `API_URL` | **はい** | `https://<api-service>.up.railway.app` |
+
+Railway の変数参照を使う場合（API サービス名が `api` のとき）:
+
+```env
+API_URL=https://${{api.RAILWAY_PUBLIC_DOMAIN}}
+```
+
+- 末尾に `/` は付けない
+- `http://api:8080`（Compose 内のホスト名）は **Railway では使えない**
+
+**Networking**
+
+- Generate Domain を有効化
+- ブラウザは Web の URL のみ開く（例: `https://dental-care-web.up.railway.app`）
+- `/graphql` は Next.js が `API_URL` へプロキシ
+
+**Watch Paths（推奨）**
+
+```
+frontend/**
+graphql/**
+```
+
+## 4. デプロイ順序
+
+1. **API** を先にデプロイし、公開 URL を確認
+2. **Web** に `API_URL` を設定してデプロイ
+3. Web の URL をブラウザで開いてダッシュボードを確認
+
+## 5. ローカルで本番相当を試す
+
+```bash
+cp .env.railway.example .env.railway
+# .env.railway の API_URL を編集
+
+docker compose -f docker-compose.railway.yml --env-file .env.railway up --build
+```
+
+- Web: http://localhost:3000  
+- API: http://localhost:8080/graphql  
+
+## 6. よくある間違い
+
+| 間違い | 正しい対応 |
+|--------|------------|
+| 起動コマンドに `docker-compose.yml` | 使わない。サービス2つ + 各 Dockerfile |
+| Web の Root を `frontend` のみ | **不可**（`graphql/` がビルドに必要）→ ルート `.` |
+| `API_URL=http://api:8080` on Railway | API の **公開 HTTPS URL** を指定 |
+| Config file が効かない | パスは **絶対パス** `/backend/railway.toml` `/railway.toml` |
+
+## 7. ファイル一覧
+
+| ファイル | 用途 |
+|----------|------|
+| `backend/railway.toml` | API ビルド・ヘルスチェック |
+| `railway.toml` | Web ビルド・ヘルスチェック |
+| `docker-compose.railway.yml` | 本番向け env 付き Compose テンプレート |
+| `.env.railway.example` | 環境変数テンプレート |
+
+開発用の `docker-compose.yml` はローカル専用のままです。
+
+## 8. Docker Compose トラブルシュート
+
+### `all predefined address pools have been fully subnetted`
+
+Docker Desktop で未使用ネットワークが溜まると発生します。
+
+```bash
+# 未使用ネットワーク削除
+docker network prune -f
+
+# それでもダメなら Docker Desktop を再起動
+```
+
+本リポジトリの compose は **固定サブネット**（`172.30.88.0/24` 等）を指定しているため、再発しにくくなっています。
+
+### Compose 内で GraphQL に繋がらない
+
+`.env.railway` に `API_URL=http://localhost:8080` を書くと **Web コンテナ内**から API に届きません。
+
+| 実行環境 | API_URL |
+|----------|---------|
+| `docker-compose.railway.yml` | 未設定（既定 `http://api:8080`）または `http://api:8080` |
+| Railway Web サービス | `https://<api>.up.railway.app` |

@@ -1,0 +1,33 @@
+# Local development only. For Railway see docs/RAILWAY.md and docker-compose.railway.yml
+
+networks:
+  dental_care:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.89.0/24
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+    networks:
+      - dental_care
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: http://api:8080
+    depends_on:
+      - api
+    networks:
+      - dental_care

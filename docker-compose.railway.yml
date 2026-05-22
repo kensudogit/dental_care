@@ -1,0 +1,44 @@
+# Production-oriented Compose template (local smoke test or Railway-like env)
+#
+# Usage:
+#   1. Copy .env.railway.example → .env.railway (optional overrides)
+#   2. docker compose -f docker-compose.railway.yml --env-file .env.railway up --build
+#
+# Compose 内では API_URL 未設定時は http://api:8080（サービス名）を使用。
+# On Railway: prefer two separate services (see docs/RAILWAY.md).
+
+networks:
+  dental_care:
+    driver: bridge
+    ipam:
+      config:
+        # Docker の default address pool 枯渇を避けるため明示サブネット
+        - subnet: 172.30.88.0/24
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment:
+      PORT: "8080"
+      ALLOWED_ORIGINS: "${ALLOWED_ORIGINS:-http://localhost:3000}"
+    networks:
+      - dental_care
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      # Compose: http://api:8080  /  Railway: https://xxx.up.railway.app
+      API_URL: ${API_URL:-http://api:8080}
+    depends_on:
+      - api
+    networks:
+      - dental_care

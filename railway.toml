@@ -1,0 +1,14 @@
+# Railway config for Web (Next.js) service
+# Dashboard: Service → Settings → Config file path → /railway.toml
+# Root Directory: . (repository root — required for graphql/ + frontend/Dockerfile)
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "frontend/Dockerfile"
+watchPatterns = ["frontend/**", "graphql/**"]
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+numReplicas = 1
