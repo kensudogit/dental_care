@@ -40,9 +40,12 @@ backend/**
 
 | 設定 | 値 |
 |------|-----|
-| **Root Directory** | `.`（リポジトリルート） |
+| **Root Directory** | **空欄**（リポジトリルート）。`frontend` にしない |
 | **Config file path** | `/railway.toml` |
-| Dockerfile | `frontend/Dockerfile`（`railway.toml` で指定済み） |
+| Dockerfile | ルートの `Dockerfile`（`railway.toml` で指定） |
+
+> **Build エラー `couldn't locate the dockerfile at path frontend/Dockerfile`**
+> → Root Directory が `frontend` になっています。**空欄に戻して**再デプロイしてください。
 
 **Variables（重要）**
 
@@ -95,7 +98,7 @@ docker compose -f docker-compose.railway.yml --env-file .env.railway up --build
 | 間違い | 正しい対応 |
 |--------|------------|
 | 起動コマンドに `docker-compose.yml` | 使わない。サービス2つ + 各 Dockerfile |
-| Web の Root を `frontend` のみ | **不可**（`graphql/` がビルドに必要）→ ルート `.` |
+| Web の Root を `frontend` に設定 | **空欄**（ルート）にする。`Dockerfile` はリポジトリ直下 |
 | `API_URL=http://api:8080` on Railway | API の **公開 HTTPS URL** を指定 |
 | Config file が効かない | パスは **絶対パス** `/backend/railway.toml` `/railway.toml` |
 

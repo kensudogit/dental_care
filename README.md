@@ -86,7 +86,7 @@ docker compose build
 docker compose up
 ```
 
-Web イメージのビルドコンテキストは **リポジトリルート** です（`graphql/schema.graphql` を Codegen が参照するため）。
+Web イメージはリポジトリルートの **`Dockerfile`** でビルドします（`graphql/` を含めるため Root Directory は空欄）。
 
 ## Railway（本番）
 

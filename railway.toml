@@ -1,11 +1,16 @@
 # Railway config for Web (Next.js) service
-# Dashboard: Service → Settings → Config file path → /railway.toml
-# Root Directory: . (repository root — required for graphql/ + frontend/Dockerfile)
+#
+# Dashboard settings (IMPORTANT):
+#   Root Directory     →  leave EMPTY (repository root). Do NOT set "frontend"
+#   Config file path   →  /railway.toml
+#
+# If Root Directory is "frontend", build fails:
+#   couldn't locate the dockerfile at path frontend/Dockerfile
 
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "frontend/Dockerfile"
-watchPatterns = ["frontend/**", "graphql/**"]
+dockerfilePath = "Dockerfile"
+watchPatterns = ["frontend/**", "graphql/**", "Dockerfile"]
 
 [deploy]
 healthcheckPath = "/"

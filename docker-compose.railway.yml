@@ -31,7 +31,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: frontend/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "${WEB_PORT:-3000}:3000"
     environment:
