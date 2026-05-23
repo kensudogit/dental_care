@@ -17,5 +17,5 @@ healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 numReplicas = 1
 
-# API_URL is not required (Go API runs in the same container on 127.0.0.1:8081).
-# Do not set API_URL on Railway Variables for unified deploy.
+# API_URL is not required for unified (single-service) deploy.
+# For two services (api + dental_care): set API_URL on dental_care to the api public HTTPS URL.

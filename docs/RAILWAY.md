@@ -21,6 +21,13 @@
 
 ## 2. API サービス（Go）
 
+> **「Suggested Variables」に `API_URL` / `API_PORT` / `WEB_PORT` が出て削除できない**
+>
+> これは **まだ追加されていない提案** です（リポジトリの `.env.railway.example` 等を Railway が検出しただけ）。
+> **削除操作は不要** — **Add を押さなければ無視して問題ありません**。
+>
+> **api サービスに `API_URL` を設定しないでください**（Web 側だけが必要）。
+
 | 設定 | 値 |
 |------|-----|
 | サービス名 | `api`（任意。Web から参照する名前） |
@@ -33,6 +40,7 @@
 | 変数 | 必須 | 説明 |
 |------|------|------|
 | `PORT` | 自動 | Railway が注入。通常は手動設定不要 |
+| `API_URL` | **設定しない** | api サービス側では不要（Suggested に出ても Add しない） |
 
 **Networking**
 
@@ -109,7 +117,7 @@ Railway Dashboard → **Web サービス**（Next.js / `dental_care`）→ **Var
 | よくある失敗 | 対処 |
 |--------------|------|
 | サービスが Web だけ | API サービス（`backend/`）を追加 |
-| **`API_URL` を api サービスに付けた** | **Web（`dental_care`）だけ**に付ける。api 側は不要 |
+| **`API_URL` を api サービスに付けた** | **Web（`dental_care`）だけ**に付ける。api 側は不要・Suggested は無視 |
 | 値が Web の URL（`dentalcare-production-....`） | **api** の URL（`api-production-....`）にする |
 | 変数名が `API URL`（スペース） | 正しくは **`API_URL`**（アンダースコア） |
 | `API_URL` が `https://` だけ | ドメインまで含む完全な URL |

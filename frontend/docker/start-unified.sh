@@ -3,6 +3,18 @@ set -e
 
 WEB_PORT="${PORT:-3000}"
 API_PORT="${API_INTERNAL_PORT:-8081}"
+
+case "${API_URL:-}" in
+  *127.0.0.1*|*localhost*)
+    ;;
+  http://*|https://*)
+    echo "[web] external API_URL=${API_URL} — Next.js only (separate api service)"
+    unset UNIFIED_DEPLOY
+    cd /app/frontend
+    PORT="${WEB_PORT}" HOSTNAME=0.0.0.0 exec npm start
+    ;;
+esac
+
 export API_INTERNAL_PORT="${API_PORT}"
 export API_URL="http://127.0.0.1:${API_PORT}"
 export UNIFIED_DEPLOY=1

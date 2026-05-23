@@ -33,6 +33,6 @@ RUN chmod +x /app/start.sh /app/server
 ENV NODE_ENV=production
 ENV API_INTERNAL_PORT=8081
 ENV UNIFIED_DEPLOY=1
-ENV APP_BUILD_ID=unified-root-v4-embedded
+ENV APP_BUILD_ID=unified-root-v5-external-api
 EXPOSE 3000
 CMD ["/bin/sh", "/app/start.sh"]

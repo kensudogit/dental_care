@@ -112,6 +112,10 @@ Web イメージは **`Dockerfile`**（Root 空欄）または **`frontend/Docke
 | Config file | **`/railway.toml`** |
 | 再デプロイ後 | トップが **ダッシュボード UI** |
 
+> **Suggested Variables が削除できない場合**
+> api サービスの Variables タブに出る `API_URL=http://localhost:8080` 等は **提案のみ** です。削除不要。**Add しない**でください。
+> 設定が必要なのは **dental_care（Web）サービス** の `API_URL` のみです。
+
 `railway.toml` は **Go + Next.js 一体型**（`Dockerfile.unified`）を使います。**`API_URL` は不要**です（一体型の場合）。
 
 > **ダッシュボードに `fetch failed` / `127.0.0.1:8081` と出る場合**

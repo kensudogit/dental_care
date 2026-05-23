@@ -97,6 +97,15 @@ function railwayInternalApiUrl(): string {
   return `http://${host}:${port}`
 }
 
+function externalApiUrlFromEnv(): string | undefined {
+  const explicit = readApiUrlFromEnv()
+  if (!explicit) return undefined
+  const normalized = normalizeApiUrl(explicit)
+  if (!normalized || pointsToThisWebService(normalized)) return undefined
+  if (isLocalhostApi(normalized)) return undefined
+  return normalized
+}
+
 export function listApiBaseCandidates(): string[] {
   const seen = new Set<string>()
   const add = (raw: string) => {
@@ -104,7 +113,10 @@ export function listApiBaseCandidates(): string[] {
     if (trimmed) seen.add(trimmed)
   }
 
-  if (isUnifiedDeploy()) {
+  const external = externalApiUrlFromEnv()
+  if (external) {
+    add(external)
+  } else if (isUnifiedDeploy()) {
     add(unifiedInternalApiUrl())
     add(`http://localhost:${process.env.API_INTERNAL_PORT?.trim() || '8081'}`)
   }
@@ -129,6 +141,11 @@ export function listApiBaseCandidates(): string[] {
 }
 
 export function resolveApiUrl(): string {
+  const external = externalApiUrlFromEnv()
+  if (external) {
+    return external
+  }
+
   if (isUnifiedDeploy()) {
     return unifiedInternalApiUrl()
   }
