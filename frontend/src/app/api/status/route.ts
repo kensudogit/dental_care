@@ -1,5 +1,6 @@
 import {
   resolveApiUrl,
+  readApiUrlFromEnv,
   isUnresolvedRailwayReference,
 } from '@/lib/resolve-api-url'
 
@@ -21,7 +22,12 @@ export const dynamic = 'force-dynamic'
 /** GET /api/status - Web to Go API connectivity check */
 export async function GET() {
   const apiUrl = resolveApiUrl()
-  const rawEnv = process.env.API_URL?.trim() ?? null
+  const rawEnv = readApiUrlFromEnv() ?? null
+  const envKeysFound = {
+    API_URL: Boolean(process.env.API_URL?.trim()),
+    'API URL': Boolean(process.env['API URL']?.trim()),
+    NEXT_PUBLIC_API_URL: Boolean(process.env.NEXT_PUBLIC_API_URL?.trim()),
+  }
 
   let health: { ok: boolean; status?: number; body?: unknown; error?: string } = {
     ok: false,
@@ -46,6 +52,8 @@ export async function GET() {
 
   return Response.json({
     web: 'ok',
+    railwayPublicDomain: process.env.RAILWAY_PUBLIC_DOMAIN ?? null,
+    envKeysFound,
     apiUrlResolved: apiUrl,
     apiUrlEnv: rawEnv,
     apiUrlInvalid: isInvalidEnv(rawEnv),

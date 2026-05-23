@@ -82,8 +82,19 @@ Railway Dashboard → **Web サービス**（Next.js / `dental_care`）→ **Var
 | よくある失敗 | 対処 |
 |--------------|------|
 | サービスが Web だけ | API サービス（`backend/`）を追加 |
+| **`API_URL` を api サービスに付けた** | **Web（`dental_care`）だけ**に付ける。api 側は不要 |
+| 値が Web の URL（`dentalcare-production-....`） | **api** の URL（`api-production-....`）にする |
+| 変数名が `API URL`（スペース） | 正しくは **`API_URL`**（アンダースコア） |
+| `API_URL` が `https://` だけ | ドメインまで含む完全な URL |
 | `${{api...}}` のまま動かない | API サービス名が `api` でない → 名前を合わせるか参照を修正 |
-| `fetch failed` | API の公開 URL で `/health` を開いて確認 → 直 URL を `API_URL` に貼る |
+| `fetch failed` | API の `/health` を確認 → 直 URL を Web の `API_URL` に貼る |
+
+**あなたの構成の正しい例**
+
+| サービス | Variables |
+|----------|-----------|
+| **api** | （`API_URL` は不要） |
+| **dental_care**（Web） | `API_URL` = `https://api-production-7f8b.up.railway.app` |
 
 設定後 **Web サービスを Redeploy**。
 

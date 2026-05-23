@@ -1,7 +1,7 @@
 /**
  * Go API base URL (no trailing slash).
- * Railway Web: API_URL must be a full URL, e.g. https://your-api.up.railway.app
- * Do NOT set API_URL to only "https://". Use Add Reference for the full domain.
+ * Railway: set API_URL on the Web service (dental_care), not on api.
+ * Value must be the api service public URL, e.g. https://api-production-xxxx.up.railway.app
  */
 
 function isRailway(): boolean {
@@ -10,6 +10,16 @@ function isRailway(): boolean {
       process.env.RAILWAY_PROJECT_ID ||
       process.env.RAILWAY_SERVICE_ID,
   )
+}
+
+/** Read API URL from env (supports common Railway typos). */
+export function readApiUrlFromEnv(): string | undefined {
+  const keys = ['API_URL', 'API URL', 'NEXT_PUBLIC_API_URL'] as const
+  for (const key of keys) {
+    const v = process.env[key]?.trim()
+    if (v) return v
+  }
+  return undefined
 }
 
 export function isUnresolvedRailwayReference(value: string): boolean {
@@ -29,6 +39,17 @@ function isInvalidApiUrlEnv(value: string): boolean {
     return false
   } catch {
     return true
+  }
+}
+
+function pointsToThisWebService(url: string): boolean {
+  const own = process.env.RAILWAY_PUBLIC_DOMAIN?.trim()
+  if (!own) return false
+  try {
+    const host = new URL(url.startsWith('http') ? url : `https://${url}`).hostname
+    return host === own
+  } catch {
+    return url.includes(own)
   }
 }
 
@@ -59,10 +80,10 @@ function railwayInternalApiUrl(): string {
 }
 
 export function resolveApiUrl(): string {
-  const explicit = process.env.API_URL?.trim()
+  const explicit = readApiUrlFromEnv()
   if (explicit) {
     const normalized = normalizeApiUrl(explicit)
-    if (normalized) {
+    if (normalized && !pointsToThisWebService(normalized)) {
       return normalized
     }
   }
@@ -79,23 +100,37 @@ export function isProductionDeploy(): boolean {
 }
 
 export function graphQLConnectionHint(): string {
-  const raw = process.env.API_URL?.trim()
+  const raw = readApiUrlFromEnv()
   const target = resolveApiUrl()
+
+  if (raw && pointsToThisWebService(normalizeApiUrl(raw) || raw)) {
+    return (
+      'API_URL is set to this Web app URL (' +
+      raw +
+      '). Delete it from the api service. On the dental_care (Web) service set API_URL ' +
+      'to the api service URL (e.g. https://api-production-xxxx.up.railway.app). Name must be API_URL with underscore.'
+    )
+  }
+
+  if (raw && process.env['API URL'] && !process.env.API_URL) {
+    return (
+      'Found variable "API URL" (with a space). Rename to API_URL (underscore) on the Web service, ' +
+      'or redeploy after our latest code. Value must be the api public URL, not the Web URL.'
+    )
+  }
 
   if (raw && isInvalidApiUrlEnv(raw) && !isUnresolvedRailwayReference(raw)) {
     return (
       'API_URL is invalid (' +
       JSON.stringify(raw) +
-      '). Set the full URL, e.g. https://YOUR-API.up.railway.app - not only "https://". ' +
-      'In Railway Variables: delete API_URL, add it again with Add Reference to your API service ' +
-      'RAILWAY_PUBLIC_DOMAIN, and type https:// before the reference chip.'
+      '). On Web service dental_care set API_URL to full api URL, e.g. https://api-production-xxxx.up.railway.app'
     )
   }
 
   if (raw && isUnresolvedRailwayReference(raw)) {
     return (
-      'API_URL is still a Railway template. Add an API service (Root Directory: backend), ' +
-      'then set API_URL via Add Reference to that service RAILWAY_PUBLIC_DOMAIN with https:// prefix.'
+      'API_URL is still a Railway template. On Web service dental_care, set API_URL via Add Reference ' +
+      'to api service RAILWAY_PUBLIC_DOMAIN with https:// prefix.'
     )
   }
 
@@ -103,7 +138,7 @@ export function graphQLConnectionHint(): string {
     return (
       'Tried ' +
       target +
-      '. Set API_URL to the full API public URL (copy from API service Settings -> Networking -> Public URL).'
+      '. On Web service dental_care set API_URL to api public URL (Settings -> Networking on api service).'
     )
   }
 
