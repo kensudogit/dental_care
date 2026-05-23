@@ -112,7 +112,15 @@ Web イメージは **`Dockerfile`**（Root 空欄）または **`frontend/Docke
 | Web（推奨） | 空欄（リポジトリルート） | `/railway.toml` |
 | Web（代替） | `frontend` | `/frontend/railway.toml` |
 
-Web の必須変数（**未設定だと `localhost:8080` に接続して失敗します**）:
+**接続確認**
+
+| URL | 期待される結果 |
+|-----|----------------|
+| `https://<web>/status` | Next.js JSON、`health.ok: true` |
+| `https://<api>/status` | Go API JSON（Web 用ではない） |
+| `https://<api>/health` | `{"ok":true,...}` |
+
+Web のトップが `dental-care-api` の JSON なら **Web サービスの Root Directory が誤っています**（[docs/RAILWAY.md](docs/RAILWAY.md) 参照）。
 
 Railway Dashboard → **Web サービス** → Variables:
 

@@ -52,9 +52,32 @@ backend/**
 
 | 設定 | 値 |
 |------|-----|
-| **Root Directory** | **空欄**（推奨）または `frontend` |
-| **Config file path** | 空欄なら `/railway.toml` / `frontend` なら `/frontend/railway.toml` |
-| Dockerfile | ルート `Dockerfile` または `frontend/Dockerfile` |
+| サービス名 | `dental_care` など（任意） |
+| **Root Directory** | **空欄**（リポジトリルート）。`backend` や `frontend` にしない |
+| **Config file path** | `/railway.toml` |
+| Dockerfile | ルートの `Dockerfile`（Next.js） |
+
+> **接続確認 `/status` が 404、トップが `{"service":"dental-care-api",...}` の JSON**
+> → Web サービスが **Go API をデプロイしている**状態です（Root Directory が `backend` など誤設定）。
+> 下記「Web サービス設定ミス」を直して **Redeploy** してください。
+
+### Web サービス設定ミス（よくある）
+
+| 項目 | 誤り | 正しい（Web） |
+|------|------|----------------|
+| Root Directory | `backend` | **空欄** |
+| Config file | `/backend/railway.toml` | **`/railway.toml`** |
+| トップ `/` の表示 | Go API の JSON | **歯科 UI（ダッシュボード）** |
+| `/status` | 404 プレーンテキスト | **JSON**（`health.ok` など） |
+
+### API サービス設定（参考・正しい例）
+
+| 項目 | 値 |
+|------|-----|
+| Root Directory | `backend` |
+| Config file | `/backend/railway.toml` |
+| トップ `/` | Go API の JSON（正常） |
+| `/status` | Go API の診断 JSON（正常） |
 
 > **Build エラー `"/frontend/package.json": not found`**
 > → Root Directory が `frontend` なのに Config file が `/railway.toml`（ルート用）のままです。

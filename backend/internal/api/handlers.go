@@ -30,12 +30,24 @@ func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) Root(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
 		"service": "dental-care-api",
+		"role":    "api",
 		"message": "GraphQL API. Open /graphql for GraphiQL. Use the Web app URL for the UI.",
 		"links": map[string]string{
 			"health":    "/health",
+			"status":    "/status",
 			"graphql":   "/graphql",
 			"dashboard": "/api/v1/dashboard",
 		},
+	})
+}
+
+func (h *Handler) Status(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]any{
+		"service": "dental-care-api",
+		"role":    "api",
+		"ok":      true,
+		"hint":    "This is the Go API. /status on the Web service (Next.js) checks API_URL connectivity. If you see this JSON on your Web domain, redeploy the Web service with Root Directory empty and /railway.toml.",
+		"health":  "/health",
 	})
 }
 
