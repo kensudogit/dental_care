@@ -12,7 +12,8 @@ const nextConfig: NextConfig = {
     // /graphql は app/graphql/route.ts でランタイムプロキシ（API_URL をビルド時に固定しない）
     return [
       { source: '/health', destination: `${apiUrl}/health` },
-      { source: '/api/:path*', destination: `${apiUrl}/api/:path*` },
+      // Legacy REST only — do NOT use /api/:path* (it steals /api/status from Next.js)
+      { source: '/api/v1/:path*', destination: `${apiUrl}/api/v1/:path*` },
     ]
   },
 }
