@@ -20,7 +20,7 @@ WORKDIR /app/frontend
 COPY --from=node-deps /app/frontend/node_modules ./node_modules
 COPY graphql ../graphql
 COPY frontend/ ./
-ENV API_URL=http://127.0.0.1:8080
+ENV API_URL=http://127.0.0.1:8081
 RUN npm run build:docker
 
 FROM node:22-alpine
@@ -35,6 +35,7 @@ COPY scripts/start-unified.sh /app/start.sh
 RUN chmod +x /app/start.sh
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV API_URL=http://127.0.0.1:8080
+ENV API_INTERNAL_PORT=8081
+ENV API_URL=http://127.0.0.1:8081
 EXPOSE 3000
 CMD ["/bin/sh", "/app/start.sh"]
