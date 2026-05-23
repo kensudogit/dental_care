@@ -1,0 +1,18 @@
+# Railway config when Web service Root Directory = frontend
+#
+# Dashboard:
+#   Root Directory     ?  frontend
+#   Config file path   ?  /frontend/railway.toml
+#
+# If Root Directory is empty, use /railway.toml at repository root instead.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+watchPatterns = ["**", "../graphql/**"]
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+numReplicas = 1

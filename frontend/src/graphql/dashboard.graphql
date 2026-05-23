@@ -1,0 +1,43 @@
+query DashboardPage {
+  dashboard {
+    patientsTotal
+    appointmentsToday
+    treatmentsThisMonth
+    revenueThisMonth
+    chairUtilization
+    noShowRate
+  }
+  appointments {
+    id
+    patientId
+    patientName
+    chair
+    startAt
+    endAt
+    type
+    status
+    staff
+    notes
+  }
+  treatments {
+    id
+    patientId
+    patientName
+    visitDate
+    tooth
+    procedure
+    diagnosis
+    fee
+    staff
+    status
+    tags
+  }
+}
+
+query HealthCheck {
+  health {
+    ok
+    service
+    version
+  }
+}

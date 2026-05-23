@@ -40,12 +40,16 @@ backend/**
 
 | 設定 | 値 |
 |------|-----|
-| **Root Directory** | **空欄**（リポジトリルート）。`frontend` にしない |
-| **Config file path** | `/railway.toml` |
-| Dockerfile | ルートの `Dockerfile`（`railway.toml` で指定） |
+| **Root Directory** | **空欄**（推奨）または `frontend` |
+| **Config file path** | 空欄なら `/railway.toml` / `frontend` なら `/frontend/railway.toml` |
+| Dockerfile | ルート `Dockerfile` または `frontend/Dockerfile` |
+
+> **Build エラー `"/frontend/package.json": not found`**
+> → Root Directory が `frontend` なのに Config file が `/railway.toml`（ルート用）のままです。
+> **Config file path を `/frontend/railway.toml` に変更**するか、Root Directory を**空欄**にして `/railway.toml` を使ってください。
 
 > **Build エラー `couldn't locate the dockerfile at path frontend/Dockerfile`**
-> → Root Directory が `frontend` になっています。**空欄に戻して**再デプロイしてください。
+> → Root Directory が `frontend` で Config file が未設定のときに起きます。**`/frontend/railway.toml`** を指定してください。
 
 **Variables（重要）**
 
@@ -98,7 +102,8 @@ docker compose -f docker-compose.railway.yml --env-file .env.railway up --build
 | 間違い | 正しい対応 |
 |--------|------------|
 | 起動コマンドに `docker-compose.yml` | 使わない。サービス2つ + 各 Dockerfile |
-| Web の Root を `frontend` に設定 | **空欄**（ルート）にする。`Dockerfile` はリポジトリ直下 |
+| Web の Root を `frontend` にしたが Config が `/railway.toml` | **`/frontend/railway.toml`** に変更 |
+| `"/frontend/package.json": not found` | 上記の組み合わせミス。Root 空欄 + `/railway.toml` でも可 |
 | `API_URL=http://api:8080` on Railway | API の **公開 HTTPS URL** を指定 |
 | Config file が効かない | パスは **絶対パス** `/backend/railway.toml` `/railway.toml` |
 

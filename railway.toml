@@ -4,8 +4,10 @@
 #   Root Directory     →  leave EMPTY (repository root). Do NOT set "frontend"
 #   Config file path   →  /railway.toml
 #
-# If Root Directory is "frontend", build fails:
-#   couldn't locate the dockerfile at path frontend/Dockerfile
+# If Root Directory is "frontend", use /frontend/railway.toml (frontend/Dockerfile).
+# Build error `"/frontend/package.json": not found` → Root is "frontend" but
+# this file (/railway.toml) is used. Switch Config file to /frontend/railway.toml
+# OR clear Root Directory and keep /railway.toml.
 
 [build]
 builder = "DOCKERFILE"

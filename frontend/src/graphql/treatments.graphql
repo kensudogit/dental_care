@@ -1,0 +1,15 @@
+query TreatmentsPage {
+  treatments {
+    id
+    patientId
+    patientName
+    visitDate
+    tooth
+    procedure
+    diagnosis
+    fee
+    staff
+    status
+    tags
+  }
+}

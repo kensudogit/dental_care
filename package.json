@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -k -n api,web \"npm run dev:api\" \"npm run dev:web\"",
-    "dev:api": "cd backend && go run ./cmd/server",
+    "dev:api": "node scripts/run-api.mjs",
     "dev:web": "cd frontend && npm run dev",
     "build:web": "cd frontend && npm run build",
     "codegen": "cd frontend && npm run codegen",

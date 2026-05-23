@@ -1,0 +1,14 @@
+query AppointmentsPage($date: String) {
+  appointments(date: $date) {
+    id
+    patientId
+    patientName
+    chair
+    startAt
+    endAt
+    type
+    status
+    staff
+    notes
+  }
+}

@@ -1,0 +1,42 @@
+query PatientsPage {
+  patients {
+    id
+    chartNo
+    name
+    kana
+    birthDate
+    phone
+    email
+    allergies
+    notes
+    lastVisit
+    createdAt
+  }
+}
+
+query PatientDetail($id: ID!) {
+  patient(id: $id) {
+    id
+    chartNo
+    name
+    kana
+    birthDate
+    phone
+    email
+    allergies
+    notes
+    lastVisit
+    createdAt
+  }
+  treatments(patientId: $id) {
+    id
+    visitDate
+    tooth
+    procedure
+    diagnosis
+    fee
+    staff
+    status
+    tags
+  }
+}
