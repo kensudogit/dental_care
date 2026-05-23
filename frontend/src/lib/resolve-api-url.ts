@@ -1,14 +1,57 @@
 /**
  * Go API base URL (no trailing slash).
- * Local default: http://localhost:8080
- * Railway Web: set API_URL to the API service public HTTPS URL.
+ *
+ * Priority:
+ * 1. API_URL (Railway: https://${{api.RAILWAY_PUBLIC_DOMAIN}})
+ * 2. On Railway without API_URL: private network (api.railway.internal:PORT)
+ * 3. Local: http://localhost:8080
  */
-export function resolveApiUrl(): string {
-  const raw = process.env.API_URL?.trim()
-  if (!raw) {
+
+function isRailway(): boolean {
+  return Boolean(
+    process.env.RAILWAY_ENVIRONMENT ||
+      process.env.RAILWAY_PROJECT_ID ||
+      process.env.RAILWAY_SERVICE_ID,
+  )
+}
+
+function normalizeApiUrl(raw: string): string {
+  const trimmed = raw.trim().replace(/\/+$/, '')
+  if (!trimmed) {
     return 'http://localhost:8080'
   }
-  return raw.replace(/\/+$/, '')
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed
+  }
+  if (trimmed.includes('.railway.internal') || trimmed.includes('localhost')) {
+    return `http://${trimmed}`
+  }
+  return `https://${trimmed}`
+}
+
+function railwayInternalApiUrl(): string {
+  const host =
+    process.env.API_INTERNAL_HOST?.trim() ||
+    process.env.RAILWAY_SERVICE_API_HOST?.trim() ||
+    'api.railway.internal'
+  const port =
+    process.env.API_INTERNAL_PORT?.trim() ||
+    process.env.API_PORT?.trim() ||
+    '8080'
+  return `http://${host}:${port}`
+}
+
+export function resolveApiUrl(): string {
+  const explicit = process.env.API_URL?.trim()
+  if (explicit) {
+    return normalizeApiUrl(explicit)
+  }
+
+  if (isRailway()) {
+    return railwayInternalApiUrl()
+  }
+
+  return 'http://localhost:8080'
 }
 
 export function isProductionDeploy(): boolean {
@@ -16,11 +59,15 @@ export function isProductionDeploy(): boolean {
 }
 
 export function graphQLConnectionHint(): string {
-  if (isProductionDeploy()) {
+  if (isProductionDeploy() && isRailway()) {
     return (
-      'Web service: set API_URL to the API public URL (https://..., no trailing slash). ' +
-      'Confirm the API service is running and GET /health responds.'
+      'Railway Web: set API_URL to https://${{api.RAILWAY_PUBLIC_DOMAIN}} ' +
+      '(api = your API service name). Or set API_INTERNAL_HOST / API_INTERNAL_PORT ' +
+      'if the API service is not named "api". Ensure the API service is deployed and GET /health works.'
     )
+  }
+  if (isProductionDeploy()) {
+    return 'Set API_URL to your API public URL (https://..., no trailing slash).'
   }
   return (
     'Local: run npm run dev from the repository root (dental_care) so both api (:8080) ' +

@@ -111,11 +111,15 @@ Web イメージは **`Dockerfile`**（Root 空欄）または **`frontend/Docke
 | Web（推奨） | 空欄（リポジトリルート） | `/railway.toml` |
 | Web（代替） | `frontend` | `/frontend/railway.toml` |
 
-Web の必須変数:
+Web の必須変数（**未設定だと `localhost:8080` に接続して失敗します**）:
+
+Railway Dashboard → **Web サービス** → Variables:
 
 ```env
-API_URL=https://<api-service>.up.railway.app
+API_URL=https://${{api.RAILWAY_PUBLIC_DOMAIN}}
 ```
+
+`api` は API サービスの名前に合わせて変更してください（例: サービス名が `backend` なら `${{backend.RAILWAY_PUBLIC_DOMAIN}}`）。
 
 詳細: [docs/RAILWAY.md](docs/RAILWAY.md)
 

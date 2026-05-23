@@ -19,3 +19,10 @@ healthcheckPath = "/"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 numReplicas = 1
+
+# Required Variables (Dashboard -> Web service -> Variables):
+#   API_URL = https://${{api.RAILWAY_PUBLIC_DOMAIN}}
+# Replace "api" with your API service name if different.
+# Optional (private network instead of public URL):
+#   API_INTERNAL_HOST = api.railway.internal
+#   API_INTERNAL_PORT = ${{api.PORT}}

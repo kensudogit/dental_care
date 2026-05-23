@@ -51,16 +51,33 @@ backend/**
 > **Build エラー `couldn't locate the dockerfile at path frontend/Dockerfile`**
 > → Root Directory が `frontend` で Config file が未設定のときに起きます。**`/frontend/railway.toml`** を指定してください。
 
-**Variables（重要）**
+**Variables（重要・必須）**
 
 | 変数 | 必須 | 値の例 |
 |------|------|--------|
-| `API_URL` | **はい** | `https://<api-service>.up.railway.app` |
+| `API_URL` | **はい** | `https://${{api.RAILWAY_PUBLIC_DOMAIN}}` |
 
-Railway の変数参照を使う場合（API サービス名が `api` のとき）:
+`API_URL` を設定しないと Web は `http://localhost:8080` に接続し、画面上で **Cannot reach API at http://localhost:8080** になります。
+
+Railway Dashboard → Web サービス → **Variables** → **New Variable**:
+
+| Name | Value |
+|------|--------|
+| `API_URL` | `https://${{api.RAILWAY_PUBLIC_DOMAIN}}` |
+
+- `api` は **API サービスの名前**（左のサービス一覧の表示名）に合わせる
+- サービス名が `backend` なら `https://${{backend.RAILWAY_PUBLIC_DOMAIN}}`
+- 末尾スラッシュなし・`https://` 付き
+
+設定後 **Redeploy** してください。
+
+**プライベートネットワークのみ使う場合（任意）**
+
+API サービス名を `api` にし、Web に次を設定する方法もあります（`API_URL` より非推奨）:
 
 ```env
-API_URL=https://${{api.RAILWAY_PUBLIC_DOMAIN}}
+API_INTERNAL_HOST=api.railway.internal
+API_INTERNAL_PORT=${{api.PORT}}
 ```
 
 - 末尾に `/` は付けない
@@ -97,7 +114,19 @@ docker compose -f docker-compose.railway.yml --env-file .env.railway up --build
 - Web: http://localhost:3000  
 - API: http://localhost:8080/graphql  
 
-## 6. よくある間違い
+## 6. `Unexpected token 'I', "Internal S"... is not valid JSON`
+
+Web が API に届いていないとき、HTML / プレーンテキストの `Internal Server Error` を JSON と誤って読み込んでこのエラーになります。
+
+| 確認 | 対応 |
+|------|------|
+| Web の `API_URL` 未設定 | `https://<api>.up.railway.app`（**https**・末尾スラッシュなし） |
+| API が未デプロイ / 落ちている | API サービスを先にデプロイし `GET /health` を確認 |
+| `API_URL=http://api:8080` | Compose 用。Railway では **公開 HTTPS URL** を使う |
+
+修正後、Web サービスを再デプロイしてください。
+
+## 7. よくある間違い
 
 | 間違い | 正しい対応 |
 |--------|------------|
@@ -107,7 +136,7 @@ docker compose -f docker-compose.railway.yml --env-file .env.railway up --build
 | `API_URL=http://api:8080` on Railway | API の **公開 HTTPS URL** を指定 |
 | Config file が効かない | パスは **絶対パス** `/backend/railway.toml` `/railway.toml` |
 
-## 7. ファイル一覧
+## 8. ファイル一覧
 
 | ファイル | 用途 |
 |----------|------|
@@ -118,7 +147,7 @@ docker compose -f docker-compose.railway.yml --env-file .env.railway up --build
 
 開発用の `docker-compose.yml` はローカル専用のままです。
 
-## 8. Docker Compose トラブルシュート
+## 9. Docker Compose トラブルシュート
 
 ### `all predefined address pools have been fully subnetted`
 
