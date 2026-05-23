@@ -1,5 +1,6 @@
 import { print } from 'graphql'
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
+import { executeEmbeddedGraphQL } from '@/lib/embedded-api/execute'
 import { listApiBaseCandidates } from '@/lib/resolve-api-url'
 
 export class GraphQLClientError extends Error {
@@ -38,16 +39,42 @@ async function postGraphQL(body: string): Promise<Response> {
     cache: 'no-store',
   }
 
-  const bases =
-    typeof window !== 'undefined' ? ['/graphql'] : listApiBaseCandidates().map((b) => `${b}/graphql`)
+  const urls =
+    typeof window !== 'undefined'
+      ? ['/graphql']
+      : [...listApiBaseCandidates().map((b) => `${b}/graphql`), 'embedded://local']
 
   const failures: string[] = []
-  for (const url of bases) {
+  for (const url of urls) {
+    if (url === 'embedded://local') {
+      const payload = JSON.parse(body) as { query: string; variables?: Record<string, unknown> }
+      const result = executeEmbeddedGraphQL(payload.query, payload.variables ?? {})
+      return new Response(JSON.stringify(result), {
+        status: result.errors?.length ? 400 : 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    }
     try {
-      return await fetch(url, init)
+      const res = await fetch(url, init)
+      if (res.ok) return res
+      const text = await res.text()
+      if (res.status === 502 || res.status === 503) {
+        failures.push(`${url}: HTTP ${res.status}`)
+        continue
+      }
+      return new Response(text, { status: res.status, headers: res.headers })
     } catch (err) {
       failures.push(`${url}: ${err instanceof Error ? err.message : String(err)}`)
     }
+  }
+
+  const payload = JSON.parse(body) as { query: string; variables?: Record<string, unknown> }
+  const result = executeEmbeddedGraphQL(payload.query, payload.variables ?? {})
+  if (result.data) {
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { 'content-type': 'application/json', 'x-graphql-source': 'embedded' },
+    })
   }
 
   throw new GraphQLClientError(`fetch failed (${failures.join('; ')})`)

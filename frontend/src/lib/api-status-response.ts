@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs'
+import { executeEmbeddedGraphQL } from '@/lib/embedded-api/execute'
 import {
   graphQLConnectionHint,
   isUnifiedDeploy,
@@ -58,24 +59,33 @@ export async function buildApiStatusResponse(): Promise<Response> {
     }
   }
 
-  const health = attempts.find((a) => a.ok) ?? attempts[0] ?? { url: candidates[0], ok: false }
+  const goHealth = attempts.find((a) => a.ok)
+  const embeddedHealth = executeEmbeddedGraphQL('{ health { ok service version } }')
+  const embeddedOk =
+    (embeddedHealth.data?.health as { ok?: boolean } | undefined)?.ok === true
 
   return Response.json({
     web: 'ok',
     buildId: process.env.APP_BUILD_ID ?? 'unknown',
+    embeddedApi: true,
+    embeddedHealth: embeddedHealth.data?.health ?? null,
     railwayPublicDomain: process.env.RAILWAY_PUBLIC_DOMAIN ?? null,
     envKeysFound,
     unifiedDeploy: isUnifiedDeploy(),
     goBinaryPresent: existsSync('/app/server'),
     apiCandidates: candidates,
-    apiUrlResolved: health.url ?? candidates[0] ?? null,
+    apiUrlResolved: goHealth?.url ?? attempts[0]?.url ?? candidates[0] ?? null,
     apiUrlEnv: rawEnv,
     apiUrlInvalid: isInvalidEnv(rawEnv),
     apiUrlUnresolvedTemplate: rawEnv ? isUnresolvedRailwayReference(rawEnv) : false,
     railway: Boolean(process.env.RAILWAY_PROJECT_ID),
-    hint: graphQLConnectionHint(),
+    hint: goHealth ? graphQLConnectionHint() : 'Using embedded GraphQL API (Go API unavailable).',
     deployCommit: process.env.RAILWAY_GIT_COMMIT_SHA ?? null,
-    health,
+    health: goHealth ?? {
+      ok: embeddedOk,
+      source: embeddedOk ? 'embedded' : 'none',
+      error: embeddedOk ? undefined : attempts[0]?.error,
+    },
     healthAttempts: attempts,
   })
 }

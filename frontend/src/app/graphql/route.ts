@@ -1,3 +1,4 @@
+import { executeEmbeddedGraphQL } from '@/lib/embedded-api/execute'
 import { listApiBaseCandidates } from '@/lib/resolve-api-url'
 
 export const runtime = 'nodejs'
@@ -17,7 +18,7 @@ async function proxy(request: Request): Promise<Response> {
     headers.set('accept', accept)
   }
 
-  const body =
+  const bodyText =
     request.method === 'GET' || request.method === 'HEAD'
       ? undefined
       : await request.text()
@@ -29,9 +30,14 @@ async function proxy(request: Request): Promise<Response> {
       const upstream = await fetch(target, {
         method: request.method,
         headers,
-        body,
+        body: bodyText,
         cache: 'no-store',
       })
+
+      if (!upstream.ok && (upstream.status === 502 || upstream.status === 503)) {
+        failures.push(`${base}: HTTP ${upstream.status}`)
+        continue
+      }
 
       const text = await upstream.text()
       const outHeaders = new Headers()
@@ -48,13 +54,22 @@ async function proxy(request: Request): Promise<Response> {
     }
   }
 
+  if (bodyText) {
+    try {
+      const payload = JSON.parse(bodyText) as { query: string; variables?: Record<string, unknown> }
+      const result = executeEmbeddedGraphQL(payload.query, payload.variables ?? {})
+      return Response.json(result, {
+        status: result.errors?.length ? 400 : 200,
+        headers: { 'x-graphql-source': 'embedded' },
+      })
+    } catch {
+      // fall through
+    }
+  }
+
   return Response.json(
     {
-      errors: [
-        {
-          message: `Cannot reach API (${failures.join('; ')})`,
-        },
-      ],
+      errors: [{ message: `Cannot reach API (${failures.join('; ')})` }],
     },
     { status: 502, headers: { 'content-type': 'application/json' } },
   )
