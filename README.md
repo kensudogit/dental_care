@@ -103,7 +103,7 @@ Web イメージは **`Dockerfile`**（Root 空欄）または **`frontend/Docke
 
 ## Railway（本番）
 
-**起動コマンドに `docker-compose.yml` は使いません。** API / Web の **2サービス** でデプロイします。
+**起動コマンドに `docker-compose.yml` は使いません。** API / Web の **2サービス** でデプロイします（Web だけでは API に繋がりません）。
 
 | サービス | Root Directory | Config file |
 |----------|----------------|-------------|

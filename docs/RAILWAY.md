@@ -9,6 +9,16 @@
 1. [Railway](https://railway.com) で New Project → Deploy from GitHub
 2. 本リポジトリ `dental_care` を選択
 
+## 1.1 サービスは **2つ** 必要です
+
+| サービス | 役割 | リポジトリ内のパス |
+|----------|------|-------------------|
+| **api**（名前は任意、下記参照） | Go GraphQL API | `backend/` |
+| **dental_care** など | Next.js Web | リポジトリルート |
+
+**Web だけ 1 サービス**だと Go API が動かず `fetch failed` になります。  
+キャンバスに API 用のサービスが無い場合は **+ New Service** → 同じ GitHub リポジトリ → Root Directory を `backend` に設定してください。
+
 ## 2. API サービス（Go）
 
 | 設定 | 値 |
@@ -59,17 +69,24 @@ backend/**
 
 `API_URL` を設定しないと Web は `http://localhost:8080` に接続し、画面上で **Cannot reach API at http://localhost:8080** になります。
 
-Railway Dashboard → Web サービス → **Variables** → **New Variable**:
+Railway Dashboard → **Web サービス**（Next.js / `dental_care`）→ **Variables**:
 
-| Name | Value |
-|------|--------|
-| `API_URL` | `https://${{api.RAILWAY_PUBLIC_DOMAIN}}` |
+1. **New Variable** → Name: `API_URL`
+2. 値は **Add Reference** から設定（推奨）:
+   - Variable: 先に作った **API サービス**（例: `api`）を選択
+   - Property: `RAILWAY_PUBLIC_DOMAIN`
+   - 先頭に `https://` を付ける（例: `https://` + 参照ドメイン）
+3. 手入力する場合: `https://${{api.RAILWAY_PUBLIC_DOMAIN}}` の **`api` は API サービスの表示名と一致**させる
 
-- `api` は **API サービスの名前**（左のサービス一覧の表示名）に合わせる
-- サービス名が `backend` なら `https://${{backend.RAILWAY_PUBLIC_DOMAIN}}`
-- 末尾スラッシュなし・`https://` 付き
+| よくある失敗 | 対処 |
+|--------------|------|
+| サービスが Web だけ | API サービス（`backend/`）を追加 |
+| `${{api...}}` のまま動かない | API サービス名が `api` でない → 名前を合わせるか参照を修正 |
+| `fetch failed` | API の公開 URL で `/health` を開いて確認 → 直 URL を `API_URL` に貼る |
 
-設定後 **Redeploy** してください。
+設定後 **Web サービスを Redeploy**。
+
+**接続確認**: `https://<web>.up.railway.app/api/status` → `health.ok: true` なら成功。
 
 **プライベートネットワークのみ使う場合（任意）**
 
