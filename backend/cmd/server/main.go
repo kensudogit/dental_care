@@ -19,7 +19,7 @@ func main() {
 	r := api.NewRouter(s)
 
 	addr := ":" + port
-	log.Printf("[dental-care-api] listening on %s", addr)
+	log.Printf("[dental-care-api] build=api-v2-pagination listening on %s", addr)
 	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatal(err)
 	}

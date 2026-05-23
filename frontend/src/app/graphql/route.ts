@@ -1,5 +1,6 @@
 import { executeEmbeddedGraphQL } from '@/lib/embedded-api/execute'
 import { isLegacySchemaError } from '@/lib/graphql-fallback'
+import { fetchLegacyGraphQL } from '@/lib/legacy-graphql/fetch'
 import { listApiBaseCandidates } from '@/lib/resolve-api-url'
 
 export const runtime = 'nodejs'
@@ -48,6 +49,13 @@ async function proxy(request: Request): Promise<Response> {
             const payload = JSON.parse(bodyText) as {
               query: string
               variables?: Record<string, unknown>
+            }
+            const legacy = await fetchLegacyGraphQL(payload.query, payload.variables ?? {})
+            if (legacy?.data && !legacy.errors?.length) {
+              return Response.json(legacy, {
+                status: 200,
+                headers: { 'x-graphql-source': 'legacy-api-fallback' },
+              })
             }
             const result = executeEmbeddedGraphQL(payload.query, payload.variables ?? {})
             return Response.json(result, {

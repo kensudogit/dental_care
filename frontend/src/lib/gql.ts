@@ -2,6 +2,7 @@ import { print } from 'graphql'
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
 import { executeEmbeddedGraphQL } from '@/lib/embedded-api/execute'
 import { isLegacySchemaError } from '@/lib/graphql-fallback'
+import { fetchLegacyGraphQL } from '@/lib/legacy-graphql/fetch'
 import { listApiBaseCandidates } from '@/lib/resolve-api-url'
 
 export class GraphQLClientError extends Error {
@@ -96,6 +97,10 @@ export async function gqlRequest<TResult, TVariables = Record<string, never>>(
   if (json.errors?.length) {
     if (isLegacySchemaError(json.errors)) {
       const payload = JSON.parse(body) as { query: string; variables?: Record<string, unknown> }
+      const legacy = await fetchLegacyGraphQL(payload.query, payload.variables ?? {})
+      if (legacy?.data && !legacy.errors?.length) {
+        return legacy.data as TResult
+      }
       const embedded = executeEmbeddedGraphQL(payload.query, payload.variables ?? {})
       if (embedded.data && !embedded.errors?.length) {
         return embedded.data as TResult
