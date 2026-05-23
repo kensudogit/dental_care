@@ -1,29 +1,42 @@
-# Web (Next.js) — build context = frontend/ (Railway Root Directory: frontend)
-# Dashboard: Config file path → /frontend/railway.toml
-#
-# If Root Directory is empty, use repository root Dockerfile instead.
+# Unified Go API + Next.js for Railway (Root Directory = frontend)
+# Builds Go from cloned monorepo; Next.js from this directory (build context).
 
-FROM node:22-alpine AS deps
+FROM golang:1.22-alpine AS go-build
+RUN apk add --no-cache git
+WORKDIR /src
+ARG REPO=https://github.com/kensudogit/dental_care.git
+RUN git clone --depth 1 "${REPO}" repo
+WORKDIR /src/repo
+RUN if [ -n "${RAILWAY_GIT_COMMIT_SHA:-}" ]; then \
+      git fetch --depth 1 origin "${RAILWAY_GIT_COMMIT_SHA}" && git checkout "${RAILWAY_GIT_COMMIT_SHA}"; \
+    fi
+WORKDIR /src/repo/backend
+RUN go mod tidy && CGO_ENABLED=0 go build -o /server ./cmd/server
+
+FROM node:22-alpine AS node-deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-FROM node:22-alpine AS build
+FROM node:22-alpine AS node-build
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=node-deps /app/node_modules ./node_modules
 COPY . .
-ARG API_URL=http://localhost:8080
-ENV API_URL=$API_URL
-# Generated types are committed; skip codegen (needs ../graphql when run locally).
+ENV UNIFIED_DEPLOY=1
 RUN npm run build:docker
 
 FROM node:22-alpine
+RUN apk add --no-cache ca-certificates curl
 WORKDIR /app
+COPY --from=go-build /server /app/server
+COPY --from=node-build /app/.next /app/frontend/.next
+COPY --from=node-build /app/node_modules /app/frontend/node_modules
+COPY --from=node-build /app/package.json /app/frontend/package.json
+COPY --from=node-build /app/public /app/frontend/public
+COPY docker/start-unified.sh /app/start.sh
+RUN chmod +x /app/start.sh
 ENV NODE_ENV=production
-# API_URL は Railway の Variables で実行時に注入
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package.json ./
-COPY --from=build /app/public ./public
+ENV API_INTERNAL_PORT=8081
+ENV UNIFIED_DEPLOY=1
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["/bin/sh", "/app/start.sh"]

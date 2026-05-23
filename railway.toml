@@ -12,7 +12,7 @@ dockerfilePath = "Dockerfile"
 watchPatterns = ["frontend/**", "backend/**", "graphql/**", "scripts/**", "Dockerfile.unified"]
 
 [deploy]
-healthcheckPath = "/"
+healthcheckPath = "/status"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 numReplicas = 1

@@ -1,18 +1,16 @@
-# Railway config when Web service Root Directory = frontend
+# Railway when Root Directory = frontend
+# Dashboard: Config file path -> /frontend/railway.toml
 #
-# Dashboard:
-#   Root Directory     ?  frontend
-#   Config file path   ?  /frontend/railway.toml
-#
-# If Root Directory is empty, use /railway.toml at repository root instead.
+# This Dockerfile bundles Go API + Next.js (UNIFIED_DEPLOY=1).
+# Delete API_URL from Railway Variables — not needed.
 
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-watchPatterns = ["**", "../graphql/**"]
+watchPatterns = ["**"]
 
 [deploy]
-healthcheckPath = "/"
+healthcheckPath = "/status"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 numReplicas = 1

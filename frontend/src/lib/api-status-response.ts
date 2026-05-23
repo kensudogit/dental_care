@@ -73,6 +73,7 @@ export async function buildApiStatusResponse(): Promise<Response> {
     apiUrlUnresolvedTemplate: rawEnv ? isUnresolvedRailwayReference(rawEnv) : false,
     railway: Boolean(process.env.RAILWAY_PROJECT_ID),
     hint: graphQLConnectionHint(),
+    deployCommit: process.env.RAILWAY_GIT_COMMIT_SHA ?? null,
     health,
     healthAttempts: attempts,
   })
