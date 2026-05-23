@@ -62,6 +62,7 @@ export async function buildApiStatusResponse(): Promise<Response> {
 
   return Response.json({
     web: 'ok',
+    buildId: process.env.APP_BUILD_ID ?? 'unknown',
     railwayPublicDomain: process.env.RAILWAY_PUBLIC_DOMAIN ?? null,
     envKeysFound,
     unifiedDeploy: isUnifiedDeploy(),
