@@ -14,3 +14,4 @@ export function StatCard({ label, value, sub, accent = 'cyan' }: Props) {
     </article>
   )
 }
+

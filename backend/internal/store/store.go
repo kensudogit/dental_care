@@ -13,15 +13,41 @@ type Store struct {
 	patients     map[string]models.Patient
 	appointments map[string]models.Appointment
 	treatments   map[string]models.TreatmentRecord
+	organizations map[string]models.Organization
+	users        map[string]models.User
+	members      map[string]models.TeamMember
+	apiKeys      map[string]models.APIKey
+	auditLogs    []models.AuditLogEntry
+	currentUserID string
+	currentOrgID  string
+	patientProfiles map[string]models.PatientProfile
+	insurance       map[string]models.InsuranceInfo
+	medicalHistories []models.MedicalHistory
+	allergyRecords   []models.AllergyRecord
+	familyMembers    []models.FamilyMember
+	questionnaires   []models.Questionnaire
+	emergencyContacts []models.EmergencyContact
+	visitRecords     []models.VisitRecord
+	chairs           []models.Chair
+	staffSchedules   []models.StaffSchedule
+	reminders        []models.ReminderNotification
 }
 
 func New() *Store {
 	s := &Store{
-		patients:     make(map[string]models.Patient),
-		appointments: make(map[string]models.Appointment),
-		treatments:   make(map[string]models.TreatmentRecord),
+		patients:      make(map[string]models.Patient),
+		appointments:  make(map[string]models.Appointment),
+		treatments:    make(map[string]models.TreatmentRecord),
+		organizations: make(map[string]models.Organization),
+		users:         make(map[string]models.User),
+		members:       make(map[string]models.TeamMember),
+		apiKeys:       make(map[string]models.APIKey),
+		patientProfiles: make(map[string]models.PatientProfile),
+		insurance:       make(map[string]models.InsuranceInfo),
 	}
 	s.seed()
+	s.seedSaas()
+	s.seedClinical()
 	return s
 }
 
@@ -141,13 +167,23 @@ func (s *Store) Dashboard() models.DashboardStats {
 			revenue += t.Fee
 		}
 	}
+	noShow := 0
+	for _, a := range s.appointments {
+		if a.NoShow || a.Status == "no_show" {
+			noShow++
+		}
+	}
+	noShowRate := 0.0
+	if len(s.appointments) > 0 {
+		noShowRate = float64(noShow) / float64(len(s.appointments))
+	}
 	return models.DashboardStats{
 		PatientsTotal:       len(s.patients),
 		AppointmentsToday:   apptToday,
 		TreatmentsThisMonth: len(s.treatments),
 		RevenueThisMonth:    revenue,
 		ChairUtilization:    0.72,
-		NoShowRate:          0.04,
+		NoShowRate:          noShowRate,
 	}
 }
 

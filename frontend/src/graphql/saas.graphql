@@ -1,0 +1,87 @@
+query SettingsOverview {
+  currentSession {
+    user { id email name }
+    organization { id name slug planTier subscriptionStatus chairCount memberCount }
+    role
+  }
+  usage {
+    members membersLimit patients patientsLimit
+    apiCallsThisMonth apiCallsLimit
+  }
+}
+
+query OrganizationSettings {
+  organization {
+    id name slug planTier subscriptionStatus chairCount timezone memberCount createdAt
+  }
+}
+
+mutation UpdateOrganization($input: UpdateOrganizationInput!) {
+  updateOrganization(input: $input) {
+    id name slug chairCount timezone
+  }
+}
+
+query TeamMembers {
+  teamMembers {
+    id role joinedAt lastActiveAt
+    user { id email name }
+  }
+}
+
+mutation InviteTeamMember($input: InviteTeamMemberInput!) {
+  inviteTeamMember(input: $input) {
+    id role
+    user { id email name }
+  }
+}
+
+mutation UpdateTeamMemberRole($input: UpdateTeamMemberRoleInput!) {
+  updateTeamMemberRole(input: $input) { id role }
+}
+
+mutation RemoveTeamMember($id: ID!) {
+  removeTeamMember(id: $id)
+}
+
+query BillingPage {
+  organization { planTier subscriptionStatus }
+  subscriptionPlans {
+    tier name priceMonthly priceYearly maxMembers maxPatients
+    features { key label included limit }
+  }
+  usage { members membersLimit patients patientsLimit apiCallsThisMonth apiCallsLimit }
+}
+
+mutation ChangePlan($tier: PlanTier!) {
+  changePlan(tier: $tier) { id planTier }
+}
+
+query ApiKeysPage {
+  apiKeys { id name prefix lastUsedAt createdAt }
+}
+
+mutation CreateApiKey($input: CreateApiKeyInput!) {
+  createApiKey(input: $input) {
+    secret
+    apiKey { id name prefix createdAt }
+  }
+}
+
+mutation RevokeApiKey($id: ID!) {
+  revokeApiKey(id: $id)
+}
+
+query AuditLogsPage($limit: Int) {
+  auditLogs(limit: $limit) {
+    id action resource actorName ipAddress metadata createdAt
+  }
+}
+
+query AppShellSession {
+  currentSession {
+    user { name }
+    organization { name planTier }
+    role
+  }
+}

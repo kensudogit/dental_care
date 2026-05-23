@@ -58,7 +58,7 @@ func (r *Resolver) Appointments(p graphql.ResolveParams) (any, error) {
 	}
 	out := make([]map[string]any, 0)
 	for _, a := range r.store.ListAppointments(date) {
-		out = append(out, appointmentToMap(a))
+		out = append(out, appointmentToMapFull(a))
 	}
 	return out, nil
 }
@@ -111,7 +111,7 @@ func (r *Resolver) CreateAppointment(p graphql.ResolveParams) (any, error) {
 		Notes:     str(in, "notes"),
 	}
 	created := r.store.CreateAppointment(a)
-	return appointmentToMap(created), nil
+	return appointmentToMapFull(created), nil
 }
 
 func toInt(v any) int {

@@ -17,16 +17,20 @@ type Patient struct {
 }
 
 type Appointment struct {
-	ID        string `json:"id"`
-	PatientID string `json:"patientId"`
-	Patient   string `json:"patientName,omitempty"`
-	Chair     int    `json:"chair"`
-	StartAt   string `json:"startAt"`
-	EndAt     string `json:"endAt"`
-	Type      string `json:"type"`
-	Status    string `json:"status"`
-	Staff     string `json:"staff"`
-	Notes     string `json:"notes"`
+	ID           string `json:"id"`
+	PatientID    string `json:"patientId"`
+	Patient      string `json:"patientName,omitempty"`
+	Chair        int    `json:"chair"`
+	StartAt      string `json:"startAt"`
+	EndAt        string `json:"endAt"`
+	Type         string `json:"type"`
+	Status       string `json:"status"`
+	Staff        string `json:"staff"`
+	StaffRole    string `json:"staffRole"`
+	Notes        string `json:"notes"`
+	NoShow       bool   `json:"noShow"`
+	CancelReason string `json:"cancelReason,omitempty"`
+	CancelledAt  string `json:"cancelledAt,omitempty"`
 }
 
 type TreatmentRecord struct {

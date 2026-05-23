@@ -1,6 +1,7 @@
-'use client'
+from pathlib import Path
 
-import Image from 'next/image'
+content = """'use client'
+
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -39,10 +40,18 @@ export function AppShell({
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="sidebar-glow" aria-hidden />
+        <motion className="sidebar-glow" aria-hidden />
         <div className="brand">
-          <div className="brand-logo">
-            <Image src="/PC.png" alt="DentalCare DX" width={44} height={44} priority />
+          <div className="brand-icon" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 3c-1.5 2.5-4 4.2-4 7.5a4 4 0 108 0C16 7.2 13.5 5.5 12 3z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+              <path d="M9 18h6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
           </div>
           <div>
             <div className="brand-title">DentalCare DX</div>
@@ -75,19 +84,16 @@ export function AppShell({
         <div className="sidebar-footer">
           <div className="stack-pill">
             <span className="stack-dot" />
-            GraphQL Â· Go + Next.js
+            GraphQL · Go + Next.js
           </div>
         </div>
       </aside>
       <div className="main-wrap">
         <header className="topbar">
-          <div className="topbar-brand">
-            <Image src="/PC.png" alt="" width={32} height={32} className="topbar-logo" aria-hidden />
-            <div>
-              <p className="topbar-eyebrow">Clinic Operations</p>
-              <h1 className="topbar-title">DentalCare DX</h1>
-            </div>
-          </div>
+          <motion>
+            <p className="topbar-eyebrow">Clinic Operations</p>
+            <h1 className="topbar-title">DentalCare DX</h1>
+          </motion>
           <div className="topbar-actions">
             {session ? (
               <>
@@ -106,3 +112,11 @@ export function AppShell({
     </div>
   )
 }
+"""
+
+content = content.replace("motion", "XXX").replace("XXX", "motion")
+# Actually replace all motion with div
+import re
+content = re.sub(r"</?motion\b", lambda m: m.group(0).replace("motion", "motion"), content)
+
+Path(r"C:\devlop\dental_care\frontend\src\components\AppShell.tsx").write_text(content, encoding="utf-8")

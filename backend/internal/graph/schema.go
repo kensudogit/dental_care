@@ -8,6 +8,15 @@ import (
 func NewSchema(s *store.Store) (graphql.Schema, error) {
 	r := &Resolver{store: s}
 
+	_, planTierEnum, _, _, orgType, teamMemberType, _, subPlanType,
+		usageType, apiKeyType, apiKeyCreatedType, auditType, sessionType,
+		updateOrgInput, inviteInput, updateRoleInput, createKeyInput := saasTypes()
+
+	clinicalProfileType, clinicalInsuranceType, _, _, _, _, _, _,
+		clinicalChairType, clinicalStaffScheduleType, _, _,
+		updateProfileInput, upsertInsuranceInput, updateApptInput, scheduleReminderInput,
+		appointmentType := clinicalTypes(r)
+
 	patientType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Patient",
 		Fields: graphql.Fields{
@@ -22,22 +31,6 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 			"notes":     &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
 			"lastVisit": &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
 			"createdAt": &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-		},
-	})
-
-	appointmentType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "Appointment",
-		Fields: graphql.Fields{
-			"id":          &graphql.Field{Type: graphql.NewNonNull(graphql.ID)},
-			"patientId":   &graphql.Field{Type: graphql.NewNonNull(graphql.ID)},
-			"patientName": &graphql.Field{Type: graphql.String},
-			"chair":       &graphql.Field{Type: graphql.NewNonNull(graphql.Int)},
-			"startAt":     &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-			"endAt":       &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-			"type":        &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-			"status":      &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-			"staff":       &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-			"notes":       &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
 		},
 	})
 
@@ -110,17 +103,17 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
-		Fields: graphql.Fields{
+		Fields: mergeFields(graphql.Fields{
 			"health": &graphql.Field{
-				Type: healthType,
+				Type:    healthType,
 				Resolve: r.Health,
 			},
 			"dashboard": &graphql.Field{
-				Type: dashboardType,
+				Type:    dashboardType,
 				Resolve: r.Dashboard,
 			},
 			"patients": &graphql.Field{
-				Type: graphql.NewList(graphql.NewNonNull(patientType)),
+				Type:    graphql.NewList(graphql.NewNonNull(patientType)),
 				Resolve: r.Patients,
 			},
 			"patient": &graphql.Field{
@@ -144,12 +137,15 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 				},
 				Resolve: r.Treatments,
 			},
-		},
+		}, mergeFields(
+			saasQueryFields(r, sessionType, orgType, teamMemberType, subPlanType, usageType, apiKeyType, auditType),
+			clinicalQueryFields(r, clinicalProfileType, clinicalChairType, clinicalStaffScheduleType, appointmentType),
+		)),
 	})
 
 	mutationType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Mutation",
-		Fields: graphql.Fields{
+		Fields: mergeFields(graphql.Fields{
 			"createPatient": &graphql.Field{
 				Type: patientType,
 				Args: graphql.FieldConfigArgument{
@@ -164,7 +160,10 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 				},
 				Resolve: r.CreateAppointment,
 			},
-		},
+		}, mergeFields(
+			saasMutationFields(r, orgType, teamMemberType, apiKeyCreatedType, planTierEnum, updateOrgInput, inviteInput, updateRoleInput, createKeyInput),
+			clinicalMutationFields(r, clinicalProfileType, clinicalInsuranceType, appointmentType, updateProfileInput, upsertInsuranceInput, updateApptInput, scheduleReminderInput),
+		)),
 	})
 
 	return graphql.NewSchema(graphql.SchemaConfig{

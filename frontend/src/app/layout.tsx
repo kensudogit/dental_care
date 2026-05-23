@@ -12,6 +12,10 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: 'DentalCare DX | 歯科医療プラットフォーム',
   description: 'GraphQL · Go + Next.js 歯科医療DXプラットフォーム',
+  icons: {
+    icon: '/PC.png',
+    apple: '/PC.png',
+  },
 }
 
 export default function RootLayout({
@@ -27,3 +31,4 @@ export default function RootLayout({
     </html>
   )
 }
+

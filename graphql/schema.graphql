@@ -90,9 +90,148 @@ type Query {
   patient(id: ID!): Patient
   appointments(date: String): [Appointment!]!
   treatments(patientId: ID): [TreatmentRecord!]!
+  currentSession: Session!
+  organization: Organization!
+  teamMembers: [TeamMember!]!
+  subscriptionPlans: [SubscriptionPlan!]!
+  usage: UsageSummary!
+  apiKeys: [ApiKey!]!
+  auditLogs(limit: Int): [AuditLogEntry!]!
 }
 
 type Mutation {
   createPatient(input: CreatePatientInput!): Patient!
   createAppointment(input: CreateAppointmentInput!): Appointment!
+  updateOrganization(input: UpdateOrganizationInput!): Organization!
+  inviteTeamMember(input: InviteTeamMemberInput!): TeamMember!
+  updateTeamMemberRole(input: UpdateTeamMemberRoleInput!): TeamMember!
+  removeTeamMember(id: ID!): Boolean!
+  createApiKey(input: CreateApiKeyInput!): ApiKeyCreated!
+  revokeApiKey(id: ID!): Boolean!
+  changePlan(tier: PlanTier!): Organization!
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum PlanTier {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+}
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  avatarUrl: String
+}
+
+type Organization {
+  id: ID!
+  name: String!
+  slug: String!
+  planTier: PlanTier!
+  subscriptionStatus: SubscriptionStatus!
+  chairCount: Int!
+  timezone: String!
+  memberCount: Int!
+  createdAt: String!
+}
+
+type TeamMember {
+  id: ID!
+  user: User!
+  role: MemberRole!
+  joinedAt: String!
+  lastActiveAt: String!
+}
+
+type PlanFeature {
+  key: String!
+  label: String!
+  included: Boolean!
+  limit: Int
+}
+
+type SubscriptionPlan {
+  tier: PlanTier!
+  name: String!
+  priceMonthly: Int!
+  priceYearly: Int!
+  maxMembers: Int!
+  maxPatients: Int!
+  features: [PlanFeature!]!
+}
+
+type UsageSummary {
+  members: Int!
+  membersLimit: Int!
+  patients: Int!
+  patientsLimit: Int!
+  apiCallsThisMonth: Int!
+  apiCallsLimit: Int!
+}
+
+type ApiKey {
+  id: ID!
+  name: String!
+  prefix: String!
+  lastUsedAt: String
+  createdAt: String!
+}
+
+type ApiKeyCreated {
+  apiKey: ApiKey!
+  secret: String!
+}
+
+type AuditLogEntry {
+  id: ID!
+  action: String!
+  resource: String!
+  actorName: String!
+  ipAddress: String!
+  metadata: String!
+  createdAt: String!
+}
+
+type Session {
+  user: User!
+  organization: Organization!
+  role: MemberRole!
+}
+
+input UpdateOrganizationInput {
+  name: String
+  slug: String
+  chairCount: Int
+  timezone: String
+}
+
+input InviteTeamMemberInput {
+  email: String!
+  name: String
+  role: MemberRole!
+}
+
+input UpdateTeamMemberRoleInput {
+  id: ID!
+  role: MemberRole!
+}
+
+input CreateApiKeyInput {
+  name: String!
 }

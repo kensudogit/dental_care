@@ -10,3 +10,4 @@ export function StatusBadge({ status }: { status: string }) {
   const label = map[status] ?? status
   return <span className={`badge badge-${status.replace('_', '-')}`}>{label}</span>
 }
+
