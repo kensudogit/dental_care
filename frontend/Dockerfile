@@ -20,8 +20,7 @@ RUN npm run build:docker
 FROM node:22-alpine
 WORKDIR /app
 ENV NODE_ENV=production
-ARG API_URL=http://localhost:8080
-ENV API_URL=$API_URL
+# API_URL は Railway の Variables で実行時に注入
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./

@@ -19,8 +19,7 @@ RUN npm run build:docker
 FROM node:22-alpine
 WORKDIR /app/frontend
 ENV NODE_ENV=production
-ARG API_URL=http://localhost:8080
-ENV API_URL=$API_URL
+# API_URL ? Railway ? Variables ????????????? localhost ???????
 COPY --from=build /app/frontend/.next ./.next
 COPY --from=build /app/frontend/node_modules ./node_modules
 COPY --from=build /app/frontend/package.json ./

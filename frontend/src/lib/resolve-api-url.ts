@@ -1,6 +1,7 @@
 /**
  * Go API base URL (no trailing slash).
- * Railway: set API_URL on the Web service (see docs/RAILWAY.md).
+ * Railway Web: API_URL must be a full URL, e.g. https://your-api.up.railway.app
+ * Do NOT set API_URL to only "https://". Use Add Reference for the full domain.
  */
 
 function isRailway(): boolean {
@@ -11,15 +12,30 @@ function isRailway(): boolean {
   )
 }
 
-/** Railway reference syntax left unexpanded (wrong service name or typo). */
 export function isUnresolvedRailwayReference(value: string): boolean {
   return value.includes('${{')
 }
 
+function isInvalidApiUrlEnv(value: string): boolean {
+  const v = value.trim()
+  if (!v) return true
+  if (isUnresolvedRailwayReference(v)) return true
+  const broken = ['https://', 'http://', 'https:', 'http:']
+  if (broken.includes(v)) return true
+  try {
+    const u = new URL(v.startsWith('http') ? v : `https://${v}`)
+    if (!u.hostname || u.hostname.length < 2) return true
+    if (u.hostname === 'https' || u.hostname === 'http') return true
+    return false
+  } catch {
+    return true
+  }
+}
+
 function normalizeApiUrl(raw: string): string {
   const trimmed = raw.trim().replace(/\/+$/, '')
-  if (!trimmed) {
-    return 'http://localhost:8080'
+  if (isInvalidApiUrlEnv(trimmed)) {
+    return ''
   }
   if (/^https?:\/\//i.test(trimmed)) {
     return trimmed
@@ -44,8 +60,11 @@ function railwayInternalApiUrl(): string {
 
 export function resolveApiUrl(): string {
   const explicit = process.env.API_URL?.trim()
-  if (explicit && !isUnresolvedRailwayReference(explicit)) {
-    return normalizeApiUrl(explicit)
+  if (explicit) {
+    const normalized = normalizeApiUrl(explicit)
+    if (normalized) {
+      return normalized
+    }
   }
 
   if (isRailway()) {
@@ -63,12 +82,20 @@ export function graphQLConnectionHint(): string {
   const raw = process.env.API_URL?.trim()
   const target = resolveApiUrl()
 
+  if (raw && isInvalidApiUrlEnv(raw) && !isUnresolvedRailwayReference(raw)) {
+    return (
+      'API_URL is invalid (' +
+      JSON.stringify(raw) +
+      '). Set the full URL, e.g. https://YOUR-API.up.railway.app - not only "https://". ' +
+      'In Railway Variables: delete API_URL, add it again with Add Reference to your API service ' +
+      'RAILWAY_PUBLIC_DOMAIN, and type https:// before the reference chip.'
+    )
+  }
+
   if (raw && isUnresolvedRailwayReference(raw)) {
     return (
-      'API_URL is still a Railway template (' +
-      raw +
-      '). Add a Go API service (Root Directory: backend). On the Web service, ' +
-      'edit API_URL using Add Reference to that service RAILWAY_PUBLIC_DOMAIN with https prefix.'
+      'API_URL is still a Railway template. Add an API service (Root Directory: backend), ' +
+      'then set API_URL via Add Reference to that service RAILWAY_PUBLIC_DOMAIN with https:// prefix.'
     )
   }
 
@@ -76,8 +103,7 @@ export function graphQLConnectionHint(): string {
     return (
       'Tried ' +
       target +
-      '. Deploy a separate API service (backend/, GET /health). ' +
-      'Set API_URL on the Web service to the API public HTTPS URL.'
+      '. Set API_URL to the full API public URL (copy from API service Settings -> Networking -> Public URL).'
     )
   }
 

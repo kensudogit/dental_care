@@ -1,4 +1,19 @@
-import { resolveApiUrl, isUnresolvedRailwayReference } from '@/lib/resolve-api-url'
+import {
+  resolveApiUrl,
+  isUnresolvedRailwayReference,
+} from '@/lib/resolve-api-url'
+
+function isInvalidEnv(value: string | null): boolean {
+  if (!value?.trim()) return true
+  const v = value.trim()
+  return (
+    v === 'https://' ||
+    v === 'http://' ||
+    v === 'https:' ||
+    v === 'http:' ||
+    isUnresolvedRailwayReference(v)
+  )
+}
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -33,6 +48,7 @@ export async function GET() {
     web: 'ok',
     apiUrlResolved: apiUrl,
     apiUrlEnv: rawEnv,
+    apiUrlInvalid: isInvalidEnv(rawEnv),
     apiUrlUnresolvedTemplate: rawEnv ? isUnresolvedRailwayReference(rawEnv) : false,
     railway: Boolean(process.env.RAILWAY_PROJECT_ID),
     health,

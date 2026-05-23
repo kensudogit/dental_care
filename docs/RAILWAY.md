@@ -73,10 +73,11 @@ Railway Dashboard → **Web サービス**（Next.js / `dental_care`）→ **Var
 
 1. **New Variable** → Name: `API_URL`
 2. 値は **Add Reference** から設定（推奨）:
-   - Variable: 先に作った **API サービス**（例: `api`）を選択
-   - Property: `RAILWAY_PUBLIC_DOMAIN`
-   - 先頭に `https://` を付ける（例: `https://` + 参照ドメイン）
-3. 手入力する場合: `https://${{api.RAILWAY_PUBLIC_DOMAIN}}` の **`api` は API サービスの表示名と一致**させる
+   - 入力欄に **`https://` を先に入力**
+   - **Add Reference** → API サービス（例: `api`）→ `RAILWAY_PUBLIC_DOMAIN`
+   - 完成形の例: `https://dental-care-api-production-xxxx.up.railway.app`
+3. **NG**: `API_URL` が `https://` だけ → `/api/status` で `apiUrlResolved: "https://https:"` になる
+4. 手入力: API サービスの **Settings → Networking → Public URL** をコピーしてそのまま貼る
 
 | よくある失敗 | 対処 |
 |--------------|------|
