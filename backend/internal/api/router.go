@@ -31,6 +31,7 @@ func NewRouter(s *store.Store) http.Handler {
 	}))
 
 	r.Get("/health", h.Health)
+	r.Get("/", h.Root)
 
 	gql, err := graph.NewHTTPHandler(s)
 	if err != nil {

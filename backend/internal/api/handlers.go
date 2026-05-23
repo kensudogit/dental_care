@@ -27,6 +27,18 @@ func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (h *Handler) Root(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]any{
+		"service": "dental-care-api",
+		"message": "GraphQL API. Open /graphql for GraphiQL. Use the Web app URL for the UI.",
+		"links": map[string]string{
+			"health":    "/health",
+			"graphql":   "/graphql",
+			"dashboard": "/api/v1/dashboard",
+		},
+	})
+}
+
 func (h *Handler) Dashboard(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, h.store.Dashboard())
 }

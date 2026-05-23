@@ -38,7 +38,9 @@
 
 - Generate Domain を有効化
 - 例: `https://dental-care-api-production.up.railway.app`
-- 動作確認: `GET /health` → `{"ok":true,...}`
+- 動作確認: `GET /health` → `{"ok":true,...}`（`/` も API 情報 JSON を返します）
+- **ブラウザで UI を見る URL ではありません** → Web サービス（`dentalcare-production-....`）を開く
+- GraphiQL: `https://<api>/graphql`
 
 **Watch Paths（推奨）**
 
