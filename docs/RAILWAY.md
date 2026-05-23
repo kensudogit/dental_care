@@ -48,14 +48,16 @@
 backend/**
 ```
 
-## 3. Web サービス（Next.js）
+## 3. Web サービス（Next.js）— 推奨: 一体型
 
 | 設定 | 値 |
 |------|-----|
 | サービス名 | `dental_care` など（任意） |
 | **Root Directory** | **空欄**（リポジトリルート）。`backend` や `frontend` にしない |
 | **Config file path** | `/railway.toml` |
-| Dockerfile | ルートの `Dockerfile`（Next.js） |
+| Dockerfile | **`Dockerfile.unified`**（Go API + Next.js を同一コンテナ） |
+
+一体型では **別 API サービス不要**、`API_URL` も不要です（コンテナ内 `127.0.0.1:8080`）。
 
 > **接続確認 `/status` が 404、トップが `{"service":"dental-care-api",...}` の JSON**
 > → Web サービスが **Go API をデプロイしている**状態です（Root Directory が `backend` など誤設定）。

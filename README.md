@@ -104,7 +104,21 @@ Web イメージは **`Dockerfile`**（Root 空欄）または **`frontend/Docke
 
 ## Railway（本番）
 
-**起動コマンドに `docker-compose.yml` は使いません。** API / Web の **2サービス** でデプロイします（Web だけでは API に繋がりません）。
+**Web で JSON（`dental-care-api`）だけ見える場合** → Web サービスの Root Directory が `backend` になっています。
+
+| 項目 | Web サービス（`dental_care`） |
+|------|------------------------------|
+| Root Directory | **空欄** |
+| Config file | **`/railway.toml`** |
+| 再デプロイ後 | トップが **ダッシュボード UI** |
+
+`railway.toml` は **Go + Next.js 一体型**（`Dockerfile.unified`）を使います。**`API_URL` は不要**です（一体型の場合）。
+
+### 2サービス構成（Web のみ Next.js、`Dockerfile` 使用時）
+
+Web だけ Next.js イメージ（`Dockerfile`）にする場合は、別 API サービスと `API_URL` が必要です。
+
+**起動コマンドに `docker-compose.yml` は使いません。**
 
 | サービス | Root Directory | Config file |
 |----------|----------------|-------------|
@@ -122,7 +136,7 @@ Web イメージは **`Dockerfile`**（Root 空欄）または **`frontend/Docke
 
 Web のトップが `dental-care-api` の JSON なら **Web サービスの Root Directory が誤っています**（[docs/RAILWAY.md](docs/RAILWAY.md) 参照）。
 
-Railway Dashboard → **Web サービス** → Variables:
+一体型（`Dockerfile.unified`）なら `API_URL` は不要です。2サービスで Web だけ Next.js の場合のみ、Railway Dashboard → **Web サービス** → Variables:
 
 ```env
 API_URL=https://${{api.RAILWAY_PUBLIC_DOMAIN}}

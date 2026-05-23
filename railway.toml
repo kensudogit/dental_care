@@ -1,18 +1,15 @@
-# Railway config for Web (Next.js) service
+# Railway — Web UI + API in ONE service (recommended if / shows Go JSON)
 #
-# Dashboard settings (IMPORTANT):
-#   Root Directory     →  leave EMPTY (repository root). Do NOT set "frontend"
+# dental_care service Settings:
+#   Root Directory     →  leave EMPTY
 #   Config file path   →  /railway.toml
 #
-# If Root Directory is "frontend", use /frontend/railway.toml (frontend/Dockerfile).
-# Build error `"/frontend/package.json": not found` → Root is "frontend" but
-# this file (/railway.toml) is used. Switch Config file to /frontend/railway.toml
-# OR clear Root Directory and keep /railway.toml.
+# After deploy: open your Web URL — you should see the dashboard, not JSON.
 
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
-watchPatterns = ["frontend/**", "graphql/**", "Dockerfile"]
+dockerfilePath = "Dockerfile.unified"
+watchPatterns = ["frontend/**", "backend/**", "graphql/**", "scripts/**", "Dockerfile.unified"]
 
 [deploy]
 healthcheckPath = "/"
@@ -20,9 +17,4 @@ healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 numReplicas = 1
 
-# Required Variables (Dashboard -> Web service -> Variables):
-#   API_URL = https://${{api.RAILWAY_PUBLIC_DOMAIN}}
-# Replace "api" with your API service name if different.
-# Optional (private network instead of public URL):
-#   API_INTERNAL_HOST = api.railway.internal
-#   API_INTERNAL_PORT = ${{api.PORT}}
+# API_URL is not required (API runs in the same container on 127.0.0.1:8080).

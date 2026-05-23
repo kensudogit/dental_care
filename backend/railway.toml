@@ -1,4 +1,4 @@
-# Railway config for API service
+# Railway config for API service (optional if using Dockerfile.unified on Web only)
 # Dashboard: Service → Settings → Config file path → /backend/railway.toml
 # Root Directory: backend
 
