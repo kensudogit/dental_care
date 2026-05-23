@@ -51,6 +51,8 @@ npm run dev
 - GraphQL / GraphiQL: http://localhost:8080/graphql  
 - レガシー REST: http://localhost:8080/api/v1/...（互換用）
 
+> `frontend` だけで `npm run dev` しても **Go API は起動しません**。必ずリポジトリルートの `npm run dev` を使ってください。
+
 ## GraphQL 開発フロー
 
 1. `graphql/schema.graphql` を編集

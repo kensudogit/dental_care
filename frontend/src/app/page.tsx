@@ -2,6 +2,7 @@ import { StatCard } from '@/components/StatCard'
 import { StatusBadge } from '@/components/StatusBadge'
 import { DashboardPageDocument, type DashboardPageQuery } from '@/lib/generated/graphql'
 import { formatTime, formatYen, gqlRequest } from '@/lib/gql'
+import { graphQLConnectionHint } from '@/lib/resolve-api-url'
 
 export const dynamic = 'force-dynamic'
 
@@ -47,7 +48,8 @@ export default async function DashboardPage() {
 
       {error ? (
         <div className="alert">
-          {error} — <code>npm run dev</code> で Go API（:8080）を起動してください。
+          <p>{error}</p>
+          <p className="alert-hint">{graphQLConnectionHint()}</p>
         </div>
       ) : null}
 

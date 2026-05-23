@@ -23,3 +23,23 @@ func corsOrigins() []string {
 	}
 	return defaults
 }
+
+// railwayOriginAllowed permits *.up.railway.app when ALLOWED_ORIGINS is unset.
+func railwayOriginAllowed(origin string) bool {
+	origin = strings.TrimSpace(origin)
+	if origin == "" {
+		return true
+	}
+	for _, allowed := range corsOrigins() {
+		if allowed == "*" || strings.EqualFold(allowed, origin) {
+			return true
+		}
+	}
+	if strings.TrimSpace(os.Getenv("ALLOWED_ORIGINS")) == "" {
+		lower := strings.ToLower(origin)
+		if strings.HasSuffix(lower, ".up.railway.app") {
+			return true
+		}
+	}
+	return false
+}

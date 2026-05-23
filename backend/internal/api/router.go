@@ -20,7 +20,10 @@ func NewRouter(s *store.Store) http.Handler {
 	r.Use(middleware.Recoverer)
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   corsOrigins(),
+		AllowedOrigins: corsOrigins(),
+		AllowOriginFunc: func(_ *http.Request, origin string) bool {
+			return railwayOriginAllowed(origin)
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 		AllowCredentials: true,

@@ -621,6 +621,17 @@ code {
   box-shadow: var(--shadow-sm);
 }
 
+.alert p {
+  margin: 0;
+}
+
+.alert-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #7f1d1d;
+  opacity: 0.95;
+}
+
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
