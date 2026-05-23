@@ -8,7 +8,7 @@
 
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile.unified"
+dockerfilePath = "Dockerfile"
 watchPatterns = ["frontend/**", "backend/**", "graphql/**", "scripts/**", "Dockerfile.unified"]
 
 [deploy]

@@ -1,7 +1,7 @@
 /**
  * Go API base URL (no trailing slash).
  *
- * Unified deploy (Dockerfile.unified): UNIFIED_DEPLOY=1, API on 127.0.0.1:8081 in same container.
+ * Unified deploy: UNIFIED_DEPLOY=1, API on 127.0.0.1:8081 in same container.
  * Two-service Railway: set API_URL on the Web service to the api public HTTPS URL.
  */
 
@@ -17,7 +17,6 @@ export function isUnifiedDeploy(): boolean {
   return process.env.UNIFIED_DEPLOY === '1' || process.env.UNIFIED_DEPLOY === 'true'
 }
 
-/** Read API URL from env (supports common Railway typos). */
 export function readApiUrlFromEnv(): string | undefined {
   const keys = ['API_URL', 'API URL', 'NEXT_PUBLIC_API_URL'] as const
   for (const key of keys) {
@@ -98,6 +97,37 @@ function railwayInternalApiUrl(): string {
   return `http://${host}:${port}`
 }
 
+export function listApiBaseCandidates(): string[] {
+  const seen = new Set<string>()
+  const add = (raw: string) => {
+    const trimmed = raw.trim().replace(/\/+$/, '')
+    if (trimmed) seen.add(trimmed)
+  }
+
+  if (isUnifiedDeploy()) {
+    add(unifiedInternalApiUrl())
+    add(`http://localhost:${process.env.API_INTERNAL_PORT?.trim() || '8081'}`)
+  }
+
+  const explicit = readApiUrlFromEnv()
+  if (explicit) {
+    const normalized = normalizeApiUrl(explicit)
+    if (normalized && !pointsToThisWebService(normalized)) {
+      if (!(isRailway() && isLocalhostApi(normalized) && !isUnifiedDeploy())) {
+        add(normalized)
+      }
+    }
+  }
+
+  if (isRailway()) {
+    add(railwayInternalApiUrl())
+  }
+
+  add(resolveApiUrl())
+  add('http://localhost:8080')
+  return [...seen]
+}
+
 export function resolveApiUrl(): string {
   if (isUnifiedDeploy()) {
     return unifiedInternalApiUrl()
@@ -131,20 +161,21 @@ export function graphQLConnectionHint(): string {
 
   if (isUnifiedDeploy()) {
     return (
-      'Unified deploy: could not reach Go API at ' +
+      'Unified deploy: Go API is not reachable at ' +
       target +
-      '. Check Railway deploy logs for "[unified]" messages and Go startup errors. ' +
-      'Ensure Root Directory is empty and Config file is /railway.toml (Dockerfile.unified). ' +
-      'Remove API_URL from Railway Variables if set to a public URL.'
+      '. Check Railway deploy logs for "[unified] API ready". ' +
+      'If goBinaryPresent is false on /status, redeploy with Root Directory empty and unified Dockerfile. ' +
+      'Remove API_URL from Railway Variables (not needed for unified).'
     )
   }
 
-  if (raw && isLocalhostApi(raw) && isRailway()) {
+  if (isProductionDeploy() && isRailway() && raw && isLocalhostApi(raw)) {
     return (
-      'API_URL points to localhost (' +
-      raw +
-      ') but this is not a unified container. Either deploy with Dockerfile.unified ' +
-      '(Root Directory empty, /railway.toml) or set API_URL to the api service public HTTPS URL.'
+      'This container runs Next.js only (Go API not bundled). ' +
+      'Delete API_URL=' +
+      JSON.stringify(raw) +
+      ' from Railway Variables and redeploy with unified Dockerfile, ' +
+      'OR set API_URL to your separate api service public HTTPS URL.'
     )
   }
 
@@ -152,44 +183,32 @@ export function graphQLConnectionHint(): string {
     return (
       'API_URL is set to this Web app URL (' +
       raw +
-      '). On the dental_care (Web) service set API_URL to the api service URL ' +
-      '(e.g. https://api-production-xxxx.up.railway.app). Name must be API_URL with underscore.'
+      '). Set API_URL to the api service URL on the Web service.'
     )
   }
 
   if (raw && process.env['API URL'] && !process.env.API_URL) {
-    return (
-      'Found variable "API URL" (with a space). Rename to API_URL (underscore) on the Web service, ' +
-      'or redeploy after our latest code. Value must be the api public URL, not the Web URL.'
-    )
+    return 'Rename variable "API URL" to API_URL (underscore) on the Web service.'
   }
 
   if (raw && isInvalidApiUrlEnv(raw) && !isUnresolvedRailwayReference(raw)) {
-    return (
-      'API_URL is invalid (' +
-      JSON.stringify(raw) +
-      '). On Web service dental_care set API_URL to full api URL, e.g. https://api-production-xxxx.up.railway.app'
-    )
+    return 'API_URL is invalid (' + JSON.stringify(raw) + '). Use full https URL.'
   }
 
   if (raw && isUnresolvedRailwayReference(raw)) {
-    return (
-      'API_URL is still a Railway template. On Web service dental_care, set API_URL via Add Reference ' +
-      'to api service RAILWAY_PUBLIC_DOMAIN with https:// prefix.'
-    )
+    return 'API_URL is still a Railway template. Set it via Add Reference with https:// prefix.'
   }
 
   if (isProductionDeploy() && isRailway()) {
     return (
       'Tried ' +
       target +
-      '. On Web service dental_care set API_URL to api public URL (Settings -> Networking on api service), ' +
-      'or switch to unified deploy (Dockerfile.unified).'
+      '. Set API_URL to api public URL or switch to unified deploy (Dockerfile).'
     )
   }
 
   if (isProductionDeploy()) {
-    return 'Tried ' + target + '. Set API_URL to the API public HTTPS URL (no trailing slash).'
+    return 'Tried ' + target + '. Set API_URL to the API public HTTPS URL.'
   }
 
   return 'Local: run npm run dev from repository root so api (:8080) and web (:3000) both start.'

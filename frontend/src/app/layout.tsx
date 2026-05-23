@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   title: 'DentalCare DX | 歯科医療プラットフォーム',
   description: 'GraphQL · Go + Next.js 歯科医療DXプラットフォーム',
   icons: {
-    icon: '/PC.png',
-    apple: '/PC.png',
+    icon: '/icon.svg',
+    apple: '/icon.svg',
   },
 }
 

@@ -1,28 +1,40 @@
-# Web (Next.js) — build context MUST be repository root (dental_care/)
-# Railway Web service: Root Directory = empty (NOT frontend/)
-# docker compose: context: .  dockerfile: Dockerfile
+# All-in-one: Go API + Next.js for a single Railway service.
+# Root Directory must be empty (repo root). Config: /railway.toml
 
-FROM node:22-alpine AS deps
+FROM golang:1.22-alpine AS go-build
+WORKDIR /app/backend
+COPY backend/go.mod backend/go.sum* ./
+RUN go mod download 2>/dev/null || true
+COPY backend/ .
+RUN go mod tidy && CGO_ENABLED=0 go build -o /server ./cmd/server
+
+FROM node:22-alpine AS node-deps
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci
 
-FROM node:22-alpine AS build
+FROM node:22-alpine AS node-build
 WORKDIR /app/frontend
-COPY --from=deps /app/frontend/node_modules ./node_modules
+COPY --from=node-deps /app/frontend/node_modules ./node_modules
 COPY graphql ../graphql
 COPY frontend/ ./
-ARG API_URL=http://localhost:8080
-ENV API_URL=$API_URL
+ENV UNIFIED_DEPLOY=1
+ENV API_URL=http://127.0.0.1:8081
 RUN npm run build:docker
 
 FROM node:22-alpine
-WORKDIR /app/frontend
+RUN apk add --no-cache ca-certificates curl
+WORKDIR /app
+COPY --from=go-build /server /app/server
+COPY --from=node-build /app/frontend/.next /app/frontend/.next
+COPY --from=node-build /app/frontend/node_modules /app/frontend/node_modules
+COPY --from=node-build /app/frontend/package.json /app/frontend/package.json
+COPY --from=node-build /app/frontend/public /app/frontend/public
+COPY scripts/start-unified.sh /app/start.sh
+RUN chmod +x /app/start.sh
 ENV NODE_ENV=production
-# API_URL ? Railway ? Variables ????????????? localhost ???????
-COPY --from=build /app/frontend/.next ./.next
-COPY --from=build /app/frontend/node_modules ./node_modules
-COPY --from=build /app/frontend/package.json ./
-COPY --from=build /app/frontend/public ./public
+ENV PORT=3000
+ENV API_INTERNAL_PORT=8081
+ENV UNIFIED_DEPLOY=1
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["/bin/sh", "/app/start.sh"]

@@ -1,11 +1,11 @@
-import { resolveApiUrl } from '@/lib/resolve-api-url'
+import { listApiBaseCandidates } from '@/lib/resolve-api-url'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 async function proxy(request: Request): Promise<Response> {
-  const apiBase = resolveApiUrl()
-  const target = `${apiBase}/graphql${new URL(request.url).search}`
+  const bases = listApiBaseCandidates()
+  const search = new URL(request.url).search
 
   const headers = new Headers()
   const contentType = request.headers.get('content-type')
@@ -17,41 +17,47 @@ async function proxy(request: Request): Promise<Response> {
     headers.set('accept', accept)
   }
 
-  let upstream: Response
-  try {
-    upstream = await fetch(target, {
-      method: request.method,
-      headers,
-      body:
-        request.method === 'GET' || request.method === 'HEAD'
-          ? undefined
-          : await request.text(),
-      cache: 'no-store',
-    })
-  } catch (err) {
-    const detail = err instanceof Error ? err.message : String(err)
-    return Response.json(
-      {
-        errors: [
-          {
-            message: `Cannot reach API at ${apiBase}: ${detail}`,
-          },
-        ],
-      },
-      { status: 502, headers: { 'content-type': 'application/json' } },
-    )
+  const body =
+    request.method === 'GET' || request.method === 'HEAD'
+      ? undefined
+      : await request.text()
+
+  const failures: string[] = []
+  for (const base of bases) {
+    const target = `${base}/graphql${search}`
+    try {
+      const upstream = await fetch(target, {
+        method: request.method,
+        headers,
+        body,
+        cache: 'no-store',
+      })
+
+      const text = await upstream.text()
+      const outHeaders = new Headers()
+      const upstreamType = upstream.headers.get('content-type')
+      if (upstreamType) {
+        outHeaders.set('content-type', upstreamType)
+      } else if (text.trimStart().startsWith('{') || text.trimStart().startsWith('[')) {
+        outHeaders.set('content-type', 'application/json')
+      }
+
+      return new Response(text, { status: upstream.status, headers: outHeaders })
+    } catch (err) {
+      failures.push(`${base}: ${err instanceof Error ? err.message : String(err)}`)
+    }
   }
 
-  const body = await upstream.text()
-  const outHeaders = new Headers()
-  const upstreamType = upstream.headers.get('content-type')
-  if (upstreamType) {
-    outHeaders.set('content-type', upstreamType)
-  } else if (body.trimStart().startsWith('{') || body.trimStart().startsWith('[')) {
-    outHeaders.set('content-type', 'application/json')
-  }
-
-  return new Response(body, { status: upstream.status, headers: outHeaders })
+  return Response.json(
+    {
+      errors: [
+        {
+          message: `Cannot reach API (${failures.join('; ')})`,
+        },
+      ],
+    },
+    { status: 502, headers: { 'content-type': 'application/json' } },
+  )
 }
 
 export async function GET(request: Request) {

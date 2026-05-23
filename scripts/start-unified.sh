@@ -38,4 +38,4 @@ fi
 
 echo "[unified] API ready; starting Next.js on ${WEB_PORT}"
 cd /app/frontend
-exec npm start -- -p "${WEB_PORT}" -H 0.0.0.0
+PORT="${WEB_PORT}" HOSTNAME=0.0.0.0 exec npm start

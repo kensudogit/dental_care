@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="DentalCare DX">
+  <rect width="64" height="64" rx="14" fill="#0f766e"/>
+  <path fill="#ecfdf5" d="M32 12c-6 0-11 4-11 10 0 4 2 7 4 10 2 3 4 8 7 8s5-5 7-8c2-3 4-6 4-10 0-6-5-10-11-10z"/>
+  <path fill="#99f6e4" d="M24 44h16v6H24z" opacity="0.9"/>
+</svg>

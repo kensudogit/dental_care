@@ -42,7 +42,7 @@ export function AppShell({
         <div className="sidebar-glow" aria-hidden />
         <div className="brand">
           <div className="brand-logo">
-            <Image src="/PC.png" alt="DentalCare DX" width={44} height={44} priority />
+            <Image src="/icon.svg" alt="DentalCare DX" width={44} height={44} priority />
           </div>
           <div>
             <div className="brand-title">DentalCare DX</div>
@@ -82,7 +82,7 @@ export function AppShell({
       <div className="main-wrap">
         <header className="topbar">
           <div className="topbar-brand">
-            <Image src="/PC.png" alt="" width={32} height={32} className="topbar-logo" aria-hidden />
+            <Image src="/icon.svg" alt="" width={32} height={32} className="topbar-logo" aria-hidden />
             <div>
               <p className="topbar-eyebrow">Clinic Operations</p>
               <h1 className="topbar-title">DentalCare DX</h1>
