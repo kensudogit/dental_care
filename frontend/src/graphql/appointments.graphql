@@ -1,14 +1,26 @@
-query AppointmentsPage($date: String) {
-  appointments(date: $date) {
-    id
-    patientId
-    patientName
-    chair
-    startAt
-    endAt
-    type
-    status
-    staff
-    notes
+query AppointmentsPage($date: String, $page: Int, $pageSize: Int) {
+  appointments(date: $date, page: $page, pageSize: $pageSize) {
+    items {
+      id
+      patientId
+      patientName
+      chair
+      startAt
+      endAt
+      type
+      status
+      staff
+      staffRole
+      notes
+      noShow
+      cancelReason
+      cancelledAt
+    }
+    pageInfo {
+      total
+      page
+      pageSize
+      totalPages
+    }
   }
 }

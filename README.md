@@ -22,8 +22,8 @@ graphql/schema.graphql     ← API の Single Source of Truth
 ## 機能
 
 - **ダッシュボード** — `dashboard` + `appointments` + `treatments`（1 Query）
-- **患者管理** — `patients`, `patient(id)`
-- **予約・診療台** — `appointments(date)`
+- **患者管理** — `patients`, `patient(id)`, `patientProfile`（保険・病歴・アレルギー・問診・来院履歴）
+- **予約・診療台** — `appointmentCalendar`, `chairs`, `staffSchedules`、予約の確認・キャンセル・ノーショー・リマインド
 - **診療記録** — `treatments(patientId)`
 - **Mutation** — `createPatient`, `createAppointment`（GraphiQL / クライアントから利用可）
 

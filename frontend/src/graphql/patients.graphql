@@ -1,16 +1,28 @@
-query PatientsPage {
-  patients {
-    id
-    chartNo
-    name
-    kana
-    birthDate
-    phone
-    email
-    allergies
-    notes
-    lastVisit
-    createdAt
+fragment PageInfoFields on PageInfo {
+  total
+  page
+  pageSize
+  totalPages
+}
+
+query PatientsPage($page: Int, $pageSize: Int) {
+  patients(page: $page, pageSize: $pageSize) {
+    items {
+      id
+      chartNo
+      name
+      kana
+      birthDate
+      phone
+      email
+      allergies
+      notes
+      lastVisit
+      createdAt
+    }
+    pageInfo {
+      ...PageInfoFields
+    }
   }
 }
 
@@ -28,15 +40,20 @@ query PatientDetail($id: ID!) {
     lastVisit
     createdAt
   }
-  treatments(patientId: $id) {
-    id
-    visitDate
-    tooth
-    procedure
-    diagnosis
-    fee
-    staff
-    status
-    tags
+  treatments(patientId: $id, page: 1, pageSize: 50) {
+    items {
+      id
+      visitDate
+      tooth
+      procedure
+      diagnosis
+      fee
+      staff
+      status
+      tags
+    }
+    pageInfo {
+      ...PageInfoFields
+    }
   }
 }

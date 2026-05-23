@@ -188,7 +188,7 @@ func saasTypes() (
 	return
 }
 
-func saasQueryFields(r *Resolver, sessionType, orgType, teamMemberType, subPlanType, usageType, apiKeyType, auditType *graphql.Object) graphql.Fields {
+func saasQueryFields(r *Resolver, sessionType, orgType, teamMemberType, subPlanType, usageType, apiKeyType, auditLogPageType *graphql.Object) graphql.Fields {
 	return graphql.Fields{
 		"currentSession": &graphql.Field{Type: sessionType, Resolve: r.CurrentSession},
 		"organization":   &graphql.Field{Type: orgType, Resolve: r.Organization},
@@ -199,10 +199,8 @@ func saasQueryFields(r *Resolver, sessionType, orgType, teamMemberType, subPlanT
 		"usage":   &graphql.Field{Type: usageType, Resolve: r.Usage},
 		"apiKeys": &graphql.Field{Type: graphql.NewList(graphql.NewNonNull(apiKeyType)), Resolve: r.APIKeys},
 		"auditLogs": &graphql.Field{
-			Type: graphql.NewList(graphql.NewNonNull(auditType)),
-			Args: graphql.FieldConfigArgument{
-				"limit": &graphql.ArgumentConfig{Type: graphql.Int},
-			},
+			Type:    auditLogPageType,
+			Args:    pageArgs(),
 			Resolve: r.AuditLogs,
 		},
 	}

@@ -15,8 +15,8 @@ const emptyData: DashboardPageQuery = {
     chairUtilization: 0,
     noShowRate: 0,
   },
-  appointments: [],
-  treatments: [],
+  appointments: { items: [] },
+  treatments: { items: [] },
 }
 
 export default async function DashboardPage() {
@@ -31,8 +31,8 @@ export default async function DashboardPage() {
   }
 
   const stats = data.dashboard
-  const appointments = data.appointments
-  const treatments = data.treatments
+  const appointments = data.appointments.items
+  const treatments = data.treatments.items
 
   const chairs = [1, 2, 3]
   const chairMap = Object.fromEntries(
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
             </tr>
           </thead>
           <tbody>
-            {treatments.slice(0, 6).map((t) => (
+            {treatments.map((t) => (
               <tr key={t.id}>
                 <td>{t.visitDate}</td>
                 <td>{t.patientName ?? t.patientId}</td>

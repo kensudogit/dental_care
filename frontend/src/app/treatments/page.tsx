@@ -1,34 +1,48 @@
+import { Pagination } from '@/components/Pagination'
 import { StatusBadge } from '@/components/StatusBadge'
 import { TreatmentsPageDocument, type TreatmentsPageQuery } from '@/lib/generated/graphql'
 import { formatYen, gqlRequest } from '@/lib/gql'
+import { parsePageParams } from '@/lib/pagination'
 
 export const dynamic = 'force-dynamic'
 
-export default async function TreatmentsPage() {
-  let error: string | null = null
-  let treatments: TreatmentsPageQuery['treatments'] = []
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
 
-  try {
-    const data = await gqlRequest(TreatmentsPageDocument)
-    treatments = data.treatments
-  } catch (e) {
-    error = e instanceof Error ? e.message : 'GraphQL エラー'
+export default async function TreatmentsPage({ searchParams }: Props) {
+  const params = await searchParams
+  const { page, pageSize } = parsePageParams(params)
+
+  let error: string | null = null
+  let result: TreatmentsPageQuery['treatments'] = {
+    items: [],
+    pageInfo: { total: 0, page: 1, pageSize, totalPages: 0 },
   }
 
+  try {
+    const data = await gqlRequest(TreatmentsPageDocument, { page, pageSize })
+    result = data.treatments
+  } catch (e) {
+    error = e instanceof Error ? e.message : 'GraphQL error'
+  }
+
+  const treatments = result.items
+  const { pageInfo } = result
   const total = treatments.reduce((s, t) => s + t.fee, 0)
 
   return (
     <>
       <div className="page-head">
         <h2>診療記録</h2>
-        <p>GraphQL Query <code>treatments</code> で処置・診断・料金を取得します。</p>
+        <p>
+          GraphQL Query <code>treatments</code> で処置・診断・料金を取得します。
+        </p>
       </div>
       {error ? <div className="alert">{error}</div> : null}
 
       <section className="stat-grid" style={{ maxWidth: 400 }}>
         <article className="stat-card accent-emerald">
-          <p className="stat-label">記録件数</p>
-          <p className="stat-value">{treatments.length} 件</p>
+          <p className="stat-label">記録件数（全件）</p>
+          <p className="stat-value">{pageInfo.total} 件</p>
         </article>
         <article className="stat-card accent-cyan">
           <p className="stat-label">合計料金（表示分）</p>
@@ -69,8 +83,14 @@ export default async function TreatmentsPage() {
             ))}
           </tbody>
         </table>
+        <Pagination
+          basePath="/treatments"
+          page={pageInfo.page}
+          pageSize={pageInfo.pageSize}
+          totalPages={pageInfo.totalPages}
+          total={pageInfo.total}
+        />
       </section>
     </>
   )
 }
-

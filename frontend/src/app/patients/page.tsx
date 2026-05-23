@@ -1,25 +1,40 @@
 import Link from 'next/link'
+import { Pagination } from '@/components/Pagination'
 import { PatientsPageDocument, type PatientsPageQuery } from '@/lib/generated/graphql'
 import { gqlRequest } from '@/lib/gql'
+import { parsePageParams } from '@/lib/pagination'
 
 export const dynamic = 'force-dynamic'
 
-export default async function PatientsPage() {
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> }
+
+export default async function PatientsPage({ searchParams }: Props) {
+  const params = await searchParams
+  const { page, pageSize } = parsePageParams(params)
+
   let error: string | null = null
-  let patients: PatientsPageQuery['patients'] = []
+  let result: PatientsPageQuery['patients'] = {
+    items: [],
+    pageInfo: { total: 0, page: 1, pageSize, totalPages: 0 },
+  }
 
   try {
-    const data = await gqlRequest(PatientsPageDocument)
-    patients = data.patients
+    const data = await gqlRequest(PatientsPageDocument, { page, pageSize })
+    result = data.patients
   } catch (e) {
-    error = e instanceof Error ? e.message : 'GraphQL エラー'
+    error = e instanceof Error ? e.message : 'GraphQL error'
   }
+
+  const patients = result.items
+  const { pageInfo } = result
 
   return (
     <>
       <div className="page-head">
         <h2>患者管理</h2>
-        <p>GraphQL Query <code>patients</code> でカルテ・連絡先を取得します。</p>
+        <p>
+          GraphQL Query <code>patients</code> でカルテ・連絡先を取得します。
+        </p>
       </div>
       {error ? <div className="alert">{error}</div> : null}
       <section className="panel">
@@ -51,8 +66,14 @@ export default async function PatientsPage() {
             ))}
           </tbody>
         </table>
+        <Pagination
+          basePath="/patients"
+          page={pageInfo.page}
+          pageSize={pageInfo.pageSize}
+          totalPages={pageInfo.totalPages}
+          total={pageInfo.total}
+        />
       </section>
     </>
   )
 }
-

@@ -73,16 +73,18 @@ func (r *Resolver) APIKeys(p graphql.ResolveParams) (any, error) {
 }
 
 func (r *Resolver) AuditLogs(p graphql.ResolveParams) (any, error) {
-	limit := toInt(p.Args["limit"])
-	out := make([]map[string]any, 0)
-	for _, e := range r.store.ListAuditLogs(limit) {
-		out = append(out, map[string]any{
+	page, pageSize := pageFromArgs(p)
+	result := r.store.PaginateAuditLogs(page, pageSize)
+	items := make([]map[string]any, 0, len(result.Items))
+	for _, e := range result.Items {
+		items = append(items, map[string]any{
 			"id": e.ID, "action": e.Action, "resource": e.Resource,
 			"actorName": e.ActorName, "ipAddress": e.IPAddress,
 			"metadata": e.Metadata, "createdAt": e.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		})
 	}
-	return out, nil
+	pi := result.PageInfo
+	return pageResult(items, pi.Total, pi.Page, pi.PageSize, pi.TotalPages), nil
 }
 
 func (r *Resolver) UpdateOrganization(p graphql.ResolveParams) (any, error) {

@@ -17,6 +17,8 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 		updateProfileInput, upsertInsuranceInput, updateApptInput, scheduleReminderInput,
 		appointmentType := clinicalTypes(r)
 
+	xrayImageType, _, createXrayInput, updateXrayInput := xrayTypes()
+
 	patientType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Patient",
 		Fields: graphql.Fields{
@@ -62,6 +64,12 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 			"noShowRate":          &graphql.Field{Type: graphql.NewNonNull(graphql.Float)},
 		},
 	})
+
+	pageInfo := pageInfoType()
+	patientPageType := pageListType("PatientPage", patientType, pageInfo)
+	appointmentPageType := pageListType("AppointmentPage", appointmentType, pageInfo)
+	treatmentPageType := pageListType("TreatmentPage", treatmentType, pageInfo)
+	auditLogPageType := pageListType("AuditLogPage", auditType, pageInfo)
 
 	healthType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Health",
@@ -113,7 +121,8 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 				Resolve: r.Dashboard,
 			},
 			"patients": &graphql.Field{
-				Type:    graphql.NewList(graphql.NewNonNull(patientType)),
+				Type:    patientPageType,
+				Args:    pageArgs(),
 				Resolve: r.Patients,
 			},
 			"patient": &graphql.Field{
@@ -124,22 +133,23 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 				Resolve: r.Patient,
 			},
 			"appointments": &graphql.Field{
-				Type: graphql.NewList(graphql.NewNonNull(appointmentType)),
-				Args: graphql.FieldConfigArgument{
+				Type: appointmentPageType,
+				Args: mergeArgs(pageArgs(), graphql.FieldConfigArgument{
 					"date": &graphql.ArgumentConfig{Type: graphql.String},
-				},
+				}),
 				Resolve: r.Appointments,
 			},
 			"treatments": &graphql.Field{
-				Type: graphql.NewList(graphql.NewNonNull(treatmentType)),
-				Args: graphql.FieldConfigArgument{
+				Type: treatmentPageType,
+				Args: mergeArgs(pageArgs(), graphql.FieldConfigArgument{
 					"patientId": &graphql.ArgumentConfig{Type: graphql.ID},
-				},
+				}),
 				Resolve: r.Treatments,
 			},
 		}, mergeFields(
-			saasQueryFields(r, sessionType, orgType, teamMemberType, subPlanType, usageType, apiKeyType, auditType),
+			saasQueryFields(r, sessionType, orgType, teamMemberType, subPlanType, usageType, apiKeyType, auditLogPageType),
 			clinicalQueryFields(r, clinicalProfileType, clinicalChairType, clinicalStaffScheduleType, appointmentType),
+			xrayQueryFields(r, xrayImageType),
 		)),
 	})
 
@@ -163,6 +173,7 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 		}, mergeFields(
 			saasMutationFields(r, orgType, teamMemberType, apiKeyCreatedType, planTierEnum, updateOrgInput, inviteInput, updateRoleInput, createKeyInput),
 			clinicalMutationFields(r, clinicalProfileType, clinicalInsuranceType, appointmentType, updateProfileInput, upsertInsuranceInput, updateApptInput, scheduleReminderInput),
+			xrayMutationFields(r, xrayImageType, createXrayInput, updateXrayInput),
 		)),
 	})
 

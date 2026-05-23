@@ -1,0 +1,47 @@
+query PatientXrays($patientId: ID!) {
+  xrayImages(patientId: $patientId) {
+    id
+    patientId
+    title
+    imageUrl
+    imageType
+    toothRegion
+    takenAt
+    notes
+    createdAt
+    updatedAt
+  }
+}
+
+mutation CreateXrayImage($input: CreateXrayImageInput!) {
+  createXrayImage(input: $input) {
+    id
+    title
+    imageUrl
+    imageType
+    toothRegion
+    takenAt
+    notes
+    updatedAt
+  }
+}
+
+mutation UpdateXrayImage($input: UpdateXrayImageInput!) {
+  updateXrayImage(input: $input) {
+    id
+    title
+    imageUrl
+    imageType
+    toothRegion
+    takenAt
+    notes
+    updatedAt
+  }
+}
+
+mutation DeleteXrayImage($id: ID!) {
+  deleteXrayImage(id: $id) {
+    id
+    imageUrl
+  }
+}

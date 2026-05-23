@@ -130,7 +130,7 @@ func (s *Store) GetInsurance(patientID string) (models.InsuranceInfo, bool) {
 	return ins, ok
 }
 
-func (s *Store) filterByPatient[T any](items []T, patientID string, getPID func(T) string) []T {
+func filterByPatientID[T any](items []T, patientID string, getPID func(T) string) []T {
 	out := make([]T, 0)
 	for _, item := range items {
 		if getPID(item) == patientID {
@@ -143,25 +143,25 @@ func (s *Store) filterByPatient[T any](items []T, patientID string, getPID func(
 func (s *Store) ListMedicalHistories(patientID string) []models.MedicalHistory {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.filterByPatient(s.medicalHistories, patientID, func(m models.MedicalHistory) string { return m.PatientID })
+	return filterByPatientID(s.medicalHistories, patientID, func(m models.MedicalHistory) string { return m.PatientID })
 }
 
 func (s *Store) ListAllergyRecords(patientID string) []models.AllergyRecord {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.filterByPatient(s.allergyRecords, patientID, func(a models.AllergyRecord) string { return a.PatientID })
+	return filterByPatientID(s.allergyRecords, patientID, func(a models.AllergyRecord) string { return a.PatientID })
 }
 
 func (s *Store) ListFamilyMembers(patientID string) []models.FamilyMember {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.filterByPatient(s.familyMembers, patientID, func(f models.FamilyMember) string { return f.PatientID })
+	return filterByPatientID(s.familyMembers, patientID, func(f models.FamilyMember) string { return f.PatientID })
 }
 
 func (s *Store) ListQuestionnaires(patientID string) []models.Questionnaire {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	out := s.filterByPatient(s.questionnaires, patientID, func(q models.Questionnaire) string { return q.PatientID })
+	out := filterByPatientID(s.questionnaires, patientID, func(q models.Questionnaire) string { return q.PatientID })
 	sort.Slice(out, func(i, j int) bool { return out[i].SubmittedAt > out[j].SubmittedAt })
 	return out
 }
@@ -169,7 +169,7 @@ func (s *Store) ListQuestionnaires(patientID string) []models.Questionnaire {
 func (s *Store) ListEmergencyContacts(patientID string) []models.EmergencyContact {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	out := s.filterByPatient(s.emergencyContacts, patientID, func(e models.EmergencyContact) string { return e.PatientID })
+	out := filterByPatientID(s.emergencyContacts, patientID, func(e models.EmergencyContact) string { return e.PatientID })
 	sort.Slice(out, func(i, j int) bool { return out[i].Priority < out[j].Priority })
 	return out
 }
@@ -177,7 +177,7 @@ func (s *Store) ListEmergencyContacts(patientID string) []models.EmergencyContac
 func (s *Store) ListVisitRecords(patientID string) []models.VisitRecord {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	out := s.filterByPatient(s.visitRecords, patientID, func(v models.VisitRecord) string { return v.PatientID })
+	out := filterByPatientID(s.visitRecords, patientID, func(v models.VisitRecord) string { return v.PatientID })
 	sort.Slice(out, func(i, j int) bool { return out[i].VisitDate > out[j].VisitDate })
 	return out
 }

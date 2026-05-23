@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -31,6 +32,7 @@ type Store struct {
 	chairs           []models.Chair
 	staffSchedules   []models.StaffSchedule
 	reminders        []models.ReminderNotification
+	xrayImages       map[string]models.XrayImage
 }
 
 func New() *Store {
@@ -44,10 +46,12 @@ func New() *Store {
 		apiKeys:       make(map[string]models.APIKey),
 		patientProfiles: make(map[string]models.PatientProfile),
 		insurance:       make(map[string]models.InsuranceInfo),
+		xrayImages:      make(map[string]models.XrayImage),
 	}
 	s.seed()
 	s.seedSaas()
 	s.seedClinical()
+	s.seedXrays()
 	return s
 }
 
@@ -60,6 +64,10 @@ func (s *Store) seed() {
 		{ID: "p2", ChartNo: "10002", Name: "佐藤 花子", Kana: "サトウ ハナコ", BirthDate: "1992-07-22", Phone: "080-9876-5432", Email: "hanako@example.com", Allergies: "", Notes: "矯正相談済", LastVisit: "2026-05-15", CreatedAt: now.Add(-200 * 24 * time.Hour)},
 		{ID: "p3", ChartNo: "10003", Name: "鈴木 一郎", Kana: "スズキ イチロウ", BirthDate: "1978-11-05", Phone: "070-1111-2222", Email: "", Allergies: "ラテックス", Notes: "", LastVisit: "2026-04-28", CreatedAt: now.Add(-90 * 24 * time.Hour)},
 		{ID: "p4", ChartNo: "10004", Name: "田中 美咲", Kana: "タナカ ミサキ", BirthDate: "2001-01-18", Phone: "090-3333-4444", Email: "misaki@example.com", Allergies: "", Notes: "学生割引対象", LastVisit: "2026-05-18", CreatedAt: now.Add(-30 * 24 * time.Hour)},
+		{ID: "p5", ChartNo: "10005", Name: "伊藤 翔", Kana: "イトウ ショウ", BirthDate: "1990-06-08", Phone: "090-2222-3333", Email: "sho@example.com", Allergies: "", Notes: "", LastVisit: "2026-05-01", CreatedAt: now.Add(-25 * 24 * time.Hour)},
+		{ID: "p6", ChartNo: "10006", Name: "渡辺 由美", Kana: "ワタナベ ユミ", BirthDate: "1988-12-20", Phone: "080-4444-5555", Email: "", Allergies: "イブプロフェン", Notes: "", LastVisit: "2026-04-15", CreatedAt: now.Add(-20 * 24 * time.Hour)},
+		{ID: "p7", ChartNo: "10007", Name: "中村 大輔", Kana: "ナカムラ ダイスケ", BirthDate: "1975-09-03", Phone: "070-6666-7777", Email: "daisuke@example.com", Allergies: "", Notes: "インプラント相談", LastVisit: "2026-03-22", CreatedAt: now.Add(-15 * 24 * time.Hour)},
+		{ID: "p8", ChartNo: "10008", Name: "小林 あゆみ", Kana: "コバヤシ アユミ", BirthDate: "1998-02-14", Phone: "090-8888-9999", Email: "ayumi@example.com", Allergies: "", Notes: "", LastVisit: "2026-05-12", CreatedAt: now.Add(-10 * 24 * time.Hour)},
 	}
 	for _, p := range patients {
 		s.patients[p.ID] = p
@@ -99,7 +107,17 @@ func (s *Store) ListPatients() []models.Patient {
 	for _, p := range s.patients {
 		out = append(out, p)
 	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ChartNo < out[j].ChartNo })
 	return out
+}
+
+func (s *Store) PaginatePatients(page, pageSize int) models.PatientPage {
+	all := s.ListPatients()
+	items, total, p, ps, tp := slicePage(all, page, pageSize)
+	return models.PatientPage{
+		Items: items,
+		PageInfo: models.PageInfo{Total: total, Page: p, PageSize: ps, TotalPages: tp},
+	}
 }
 
 func (s *Store) GetPatient(id string) (models.Patient, bool) {
@@ -126,7 +144,17 @@ func (s *Store) ListAppointments(date string) []models.Appointment {
 			out = append(out, a)
 		}
 	}
+	sort.Slice(out, func(i, j int) bool { return out[i].StartAt < out[j].StartAt })
 	return out
+}
+
+func (s *Store) PaginateAppointments(date string, page, pageSize int) models.AppointmentPage {
+	all := s.ListAppointments(date)
+	items, total, p, ps, tp := slicePage(all, page, pageSize)
+	return models.AppointmentPage{
+		Items: items,
+		PageInfo: models.PageInfo{Total: total, Page: p, PageSize: ps, TotalPages: tp},
+	}
 }
 
 func (s *Store) CreateAppointment(a models.Appointment) models.Appointment {
@@ -148,7 +176,17 @@ func (s *Store) ListTreatments(patientID string) []models.TreatmentRecord {
 			out = append(out, t)
 		}
 	}
+	sort.Slice(out, func(i, j int) bool { return out[i].VisitDate > out[j].VisitDate })
 	return out
+}
+
+func (s *Store) PaginateTreatments(patientID string, page, pageSize int) models.TreatmentPage {
+	all := s.ListTreatments(patientID)
+	items, total, p, ps, tp := slicePage(all, page, pageSize)
+	return models.TreatmentPage{
+		Items: items,
+		PageInfo: models.PageInfo{Total: total, Page: p, PageSize: ps, TotalPages: tp},
+	}
 }
 
 func (s *Store) Dashboard() models.DashboardStats {

@@ -47,7 +47,7 @@ export function ApiKeyManager({ keys: initial }: { keys: Key[] }) {
     <div className="api-key-manager">
       <form className="saas-form panel" onSubmit={createKey}>
         <h3>Create API key</h3>
-        <p className="muted">Use keys for B2B integrations (labs, imaging, partner apps).</p>
+        <p className="muted">Use keys for B2B integrations.</p>
         <label>
           Key name
           <input value={name} onChange={(e) => setName(e.target.value)} required />
@@ -59,7 +59,7 @@ export function ApiKeyManager({ keys: initial }: { keys: Key[] }) {
 
       {secret ? (
         <div className="alert alert-success">
-          <strong>Copy this secret now — it will not be shown again:</strong>
+          <strong>Copy this secret now. It will not be shown again:</strong>
           <code className="secret-block">{secret}</code>
         </div>
       ) : null}
@@ -80,7 +80,7 @@ export function ApiKeyManager({ keys: initial }: { keys: Key[] }) {
             {keys.map((k) => (
               <tr key={k.id}>
                 <td>{k.name}</td>
-                <td className="mono">{k.prefix}••••</td>
+                <td className="mono">{k.prefix}****</td>
                 <td className="mono">{new Date(k.createdAt).toLocaleString('ja-JP')}</td>
                 <td>
                   <button type="button" className="btn-ghost" onClick={() => revoke(k.id)}>

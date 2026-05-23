@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <rect width="400" height="300" fill="#0a1628"/>
+  <rect x="20" y="20" width="360" height="260" fill="#111d33" stroke="#2dd4bf" stroke-width="2" rx="4"/>
+  <text x="200" y="140" text-anchor="middle" fill="#5eead4" font-family="monospace" font-size="14">DENTAL X-RAY</text>
+  <text x="200" y="165" text-anchor="middle" fill="#64748b" font-family="sans-serif" font-size="11">placeholder</text>
+  <ellipse cx="200" cy="200" rx="80" ry="30" fill="none" stroke="#334155" stroke-width="1.5"/>
+  <path d="M160 200 Q200 170 240 200" fill="none" stroke="#475569" stroke-width="1"/>
+  <path d="M170 210 L190 195 L210 210 L230 195 L250 210" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+</svg>

@@ -1,0 +1,166 @@
+fragment PatientProfileFields on PatientProfile {
+  id
+  chartNo
+  name
+  kana
+  birthDate
+  gender
+  phone
+  email
+  address
+  allergies
+  notes
+  lastVisit
+  createdAt
+  insurance {
+    insurerName
+    symbol
+    number
+    copayCategory
+    validUntil
+  }
+  medicalHistories {
+    id
+    condition
+    diagnosedAt
+    notes
+    resolved
+  }
+  allergyRecords {
+    id
+    substance
+    severity
+    reaction
+  }
+  familyMembers {
+    id
+    name
+    relationship
+    phone
+    linkedPatientId
+  }
+  questionnaires {
+    id
+    submittedAt
+    chiefComplaint
+    currentMedications
+    smoking
+    pregnancy
+    dentalAnxiety
+    notes
+  }
+  emergencyContacts {
+    id
+    name
+    relationship
+    phone
+    priority
+  }
+  visitHistory {
+    id
+    visitDate
+    visitType
+    summary
+    staff
+    status
+  }
+}
+
+query PatientClinicalProfile($id: ID!) {
+  patientProfile(id: $id) {
+    ...PatientProfileFields
+  }
+}
+
+mutation UpdatePatientProfile($input: UpdatePatientProfileInput!) {
+  updatePatientProfile(input: $input) {
+    ...PatientProfileFields
+  }
+}
+
+mutation UpsertInsurance($input: UpsertInsuranceInput!) {
+  upsertInsurance(input: $input) {
+    insurerName
+    symbol
+    number
+    copayCategory
+    validUntil
+  }
+}
+
+fragment AppointmentClinicalFields on Appointment {
+  id
+  patientId
+  patientName
+  chair
+  startAt
+  endAt
+  type
+  status
+  staff
+  staffRole
+  notes
+  noShow
+  cancelReason
+  cancelledAt
+  reminders {
+    id
+    channel
+    scheduledAt
+    status
+    sentAt
+    recipient
+  }
+}
+
+query AppointmentCalendarPage($from: String!, $to: String!, $scheduleDate: String) {
+  appointmentCalendar(from: $from, to: $to) {
+    ...AppointmentClinicalFields
+  }
+  chairs {
+    id
+    number
+    name
+    status
+  }
+  staffSchedules(date: $scheduleDate) {
+    id
+    staffName
+    role
+    date
+    startTime
+    endTime
+    notes
+  }
+  noShowAppointments {
+    ...AppointmentClinicalFields
+  }
+}
+
+mutation CancelAppointment($id: ID!, $reason: String) {
+  cancelAppointment(id: $id, reason: $reason) {
+    ...AppointmentClinicalFields
+  }
+}
+
+mutation MarkAppointmentNoShow($id: ID!) {
+  markAppointmentNoShow(id: $id) {
+    ...AppointmentClinicalFields
+  }
+}
+
+mutation UpdateAppointmentClinical($input: UpdateAppointmentInput!) {
+  updateAppointment(input: $input) {
+    ...AppointmentClinicalFields
+  }
+}
+
+mutation ScheduleReminder($input: ScheduleReminderInput!) {
+  scheduleReminder(input: $input) {
+    id
+    channel
+    scheduledAt
+    status
+    recipient
+  }
+}

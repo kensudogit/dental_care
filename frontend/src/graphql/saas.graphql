@@ -72,9 +72,23 @@ mutation RevokeApiKey($id: ID!) {
   revokeApiKey(id: $id)
 }
 
-query AuditLogsPage($limit: Int) {
-  auditLogs(limit: $limit) {
-    id action resource actorName ipAddress metadata createdAt
+query AuditLogsPage($page: Int, $pageSize: Int) {
+  auditLogs(page: $page, pageSize: $pageSize) {
+    items {
+      id
+      action
+      resource
+      actorName
+      ipAddress
+      metadata
+      createdAt
+    }
+    pageInfo {
+      total
+      page
+      pageSize
+      totalPages
+    }
   }
 }
 

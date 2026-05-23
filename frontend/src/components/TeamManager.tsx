@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { RoleBadge } from '@/components/RoleBadge'
 import {
   InviteTeamMemberDocument,
+  MemberRole,
   RemoveTeamMemberDocument,
   UpdateTeamMemberRoleDocument,
   type TeamMembersQuery,
@@ -13,14 +14,14 @@ import { gqlRequest } from '@/lib/gql'
 
 type Member = TeamMembersQuery['teamMembers'][number]
 
-const roles = ['OWNER', 'ADMIN', 'MEMBER', 'VIEWER'] as const
+const roles: MemberRole[] = [MemberRole.Owner, MemberRole.Admin, MemberRole.Member, MemberRole.Viewer]
 
 export function TeamManager({ members: initial }: { members: Member[] }) {
   const router = useRouter()
   const [members, setMembers] = useState(initial)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
-  const [role, setRole] = useState<(typeof roles)[number]>('MEMBER')
+  const [role, setRole] = useState<MemberRole>(MemberRole.Member)
   const [message, setMessage] = useState<string | null>(null)
 
   async function invite(e: React.FormEvent) {
@@ -42,7 +43,7 @@ export function TeamManager({ members: initial }: { members: Member[] }) {
 
   async function changeRole(id: string, next: string) {
     try {
-      await gqlRequest(UpdateTeamMemberRoleDocument, { input: { id, role: next as (typeof roles)[number] } })
+      await gqlRequest(UpdateTeamMemberRoleDocument, { input: { id, role: next as MemberRole } })
       setMembers((prev) => prev.map((m) => (m.id === id ? { ...m, role: next as Member['role'] } : m)))
       router.refresh()
     } catch (err) {
@@ -75,7 +76,7 @@ export function TeamManager({ members: initial }: { members: Member[] }) {
           </label>
           <label>
             Role
-            <select value={role} onChange={(e) => setRole(e.target.value as (typeof roles)[number])}>
+            <select value={role} onChange={(e) => setRole(e.target.value as MemberRole)}>
               {roles.map((r) => (
                 <option key={r} value={r}>
                   {r}

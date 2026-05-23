@@ -695,3 +695,261 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---- X-ray gallery ---- */
+.xray-panel-head {
+  margin-bottom: 1rem;
+}
+
+.xray-form {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--panel-solid);
+}
+
+.xray-form h4 {
+  margin: 0 0 1rem;
+}
+
+.xray-preview {
+  margin: 0.75rem 0;
+  max-width: 320px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.xray-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.xray-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.xray-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--panel-solid);
+  box-shadow: var(--shadow-sm);
+}
+
+.xray-thumb {
+  position: relative;
+  height: 160px;
+  background: #0a1628;
+}
+
+.xray-img {
+  object-fit: contain;
+}
+
+.xray-card-body {
+  padding: 0.85rem 1rem;
+}
+
+.xray-card-body h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.xray-meta {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.xray-notes {
+  margin: 0.4rem 0 0;
+  font-size: 0.82rem;
+}
+
+.xray-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.btn-primary {
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-ghost.danger {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.saas-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.65rem;
+}
+
+.saas-form input,
+.saas-form select {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.form-status {
+  font-size: 0.88rem;
+  color: var(--accent);
+  margin: 0.5rem 0;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.pagination-summary {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-solid);
+  color: var(--text);
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+
+.pagination-btn:hover:not(.disabled) {
+  border-color: var(--border-strong);
+  background: var(--accent-soft);
+}
+
+.pagination-btn.disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.pagination-current {
+  font-size: 0.88rem;
+  color: var(--muted);
+  min-width: 4rem;
+  text-align: center;
+}
+
+.patient-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.patient-tab {
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-solid);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.patient-tab.active {
+  border-color: var(--border-strong);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.calendar-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.action-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.btn.sm {
+  padding: 0.2rem 0.45rem;
+  font-size: 0.75rem;
+}
+
+.btn.danger {
+  color: #b91c1c;
+}
+
+.tag.warn {
+  margin-left: 0.35rem;
+  font-size: 0.72rem;
+  color: #b45309;
+}
+
+.data-table.compact td,
+.data-table.compact th {
+  padding: 0.35rem 0.5rem;
+}
+
+.block {
+  display: block;
+}

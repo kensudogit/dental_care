@@ -245,12 +245,9 @@ func (s *Store) ListAPIKeys() []models.APIKey {
 	return out
 }
 
-func (s *Store) ListAuditLogs(limit int) []models.AuditLogEntry {
+func (s *Store) PaginateAuditLogs(page, pageSize int) models.AuditLogPage {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	if limit <= 0 {
-		limit = 50
-	}
 	out := make([]models.AuditLogEntry, 0)
 	for _, e := range s.auditLogs {
 		if e.OrgID == s.currentOrgID {
@@ -260,10 +257,16 @@ func (s *Store) ListAuditLogs(limit int) []models.AuditLogEntry {
 	sort.Slice(out, func(i, j int) bool {
 		return out[i].CreatedAt.After(out[j].CreatedAt)
 	})
-	if len(out) > limit {
-		out = out[:limit]
+	items, total, p, ps, tp := slicePage(out, page, pageSize)
+	return models.AuditLogPage{
+		Items: items,
+		PageInfo: models.PageInfo{Total: total, Page: p, PageSize: ps, TotalPages: tp},
 	}
-	return out
+}
+
+func (s *Store) ListAuditLogs(limit int) []models.AuditLogEntry {
+	page := s.PaginateAuditLogs(1, limit)
+	return page.Items
 }
 
 func (s *Store) appendAudit(action, resource, metadata string) {

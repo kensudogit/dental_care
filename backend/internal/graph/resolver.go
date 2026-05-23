@@ -34,11 +34,14 @@ func (r *Resolver) Dashboard(p graphql.ResolveParams) (any, error) {
 }
 
 func (r *Resolver) Patients(p graphql.ResolveParams) (any, error) {
-	out := make([]map[string]any, 0)
-	for _, pt := range r.store.ListPatients() {
-		out = append(out, patientToMap(pt))
+	page, pageSize := pageFromArgs(p)
+	result := r.store.PaginatePatients(page, pageSize)
+	items := make([]map[string]any, 0, len(result.Items))
+	for _, pt := range result.Items {
+		items = append(items, patientToMap(pt))
 	}
-	return out, nil
+	pi := result.PageInfo
+	return pageResult(items, pi.Total, pi.Page, pi.PageSize, pi.TotalPages), nil
 }
 
 func (r *Resolver) Patient(p graphql.ResolveParams) (any, error) {
@@ -56,20 +59,26 @@ func (r *Resolver) Appointments(p graphql.ResolveParams) (any, error) {
 	if date == "" {
 		date = time.Now().Format("2006-01-02")
 	}
-	out := make([]map[string]any, 0)
-	for _, a := range r.store.ListAppointments(date) {
-		out = append(out, appointmentToMapFull(a))
+	page, pageSize := pageFromArgs(p)
+	result := r.store.PaginateAppointments(date, page, pageSize)
+	items := make([]map[string]any, 0, len(result.Items))
+	for _, a := range result.Items {
+		items = append(items, appointmentToMapFull(a))
 	}
-	return out, nil
+	pi := result.PageInfo
+	return pageResult(items, pi.Total, pi.Page, pi.PageSize, pi.TotalPages), nil
 }
 
 func (r *Resolver) Treatments(p graphql.ResolveParams) (any, error) {
 	pid, _ := p.Args["patientId"].(string)
-	out := make([]map[string]any, 0)
-	for _, t := range r.store.ListTreatments(pid) {
-		out = append(out, treatmentToMap(t))
+	page, pageSize := pageFromArgs(p)
+	result := r.store.PaginateTreatments(pid, page, pageSize)
+	items := make([]map[string]any, 0, len(result.Items))
+	for _, t := range result.Items {
+		items = append(items, treatmentToMap(t))
 	}
-	return out, nil
+	pi := result.PageInfo
+	return pageResult(items, pi.Total, pi.Page, pi.PageSize, pi.TotalPages), nil
 }
 
 func (r *Resolver) CreatePatient(p graphql.ResolveParams) (any, error) {

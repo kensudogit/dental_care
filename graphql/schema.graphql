@@ -55,7 +55,12 @@ type Appointment {
   type: String!
   status: String!
   staff: String!
+  staffRole: String!
   notes: String!
+  noShow: Boolean!
+  cancelReason: String
+  cancelledAt: String
+  reminders: [ReminderNotification!]
 }
 
 input CreateAppointmentInput {
@@ -83,20 +88,200 @@ type TreatmentRecord {
   tags: [String!]!
 }
 
+type PageInfo {
+  total: Int!
+  page: Int!
+  pageSize: Int!
+  totalPages: Int!
+}
+
+type PatientPage {
+  items: [Patient!]!
+  pageInfo: PageInfo!
+}
+
+type AppointmentPage {
+  items: [Appointment!]!
+  pageInfo: PageInfo!
+}
+
+type TreatmentPage {
+  items: [TreatmentRecord!]!
+  pageInfo: PageInfo!
+}
+
+type AuditLogPage {
+  items: [AuditLogEntry!]!
+  pageInfo: PageInfo!
+}
+
+type InsuranceInfo {
+  insurerName: String!
+  symbol: String!
+  number: String!
+  copayCategory: String!
+  validUntil: String!
+}
+
+type MedicalHistory {
+  id: ID!
+  condition: String!
+  diagnosedAt: String!
+  notes: String!
+  resolved: Boolean!
+}
+
+type AllergyRecord {
+  id: ID!
+  substance: String!
+  severity: String!
+  reaction: String!
+}
+
+type FamilyMember {
+  id: ID!
+  name: String!
+  relationship: String!
+  phone: String!
+  linkedPatientId: ID
+}
+
+type Questionnaire {
+  id: ID!
+  submittedAt: String!
+  chiefComplaint: String!
+  currentMedications: String!
+  smoking: Boolean!
+  pregnancy: Boolean!
+  dentalAnxiety: Int!
+  notes: String!
+}
+
+type EmergencyContact {
+  id: ID!
+  name: String!
+  relationship: String!
+  phone: String!
+  priority: Int!
+}
+
+type VisitRecord {
+  id: ID!
+  visitDate: String!
+  visitType: String!
+  summary: String!
+  staff: String!
+  status: String!
+}
+
+type PatientProfile {
+  id: ID!
+  chartNo: String!
+  name: String!
+  kana: String!
+  birthDate: String!
+  gender: String!
+  phone: String!
+  email: String!
+  address: String!
+  allergies: String!
+  notes: String!
+  lastVisit: String!
+  createdAt: String!
+  insurance: InsuranceInfo
+  medicalHistories: [MedicalHistory!]
+  allergyRecords: [AllergyRecord!]
+  familyMembers: [FamilyMember!]
+  questionnaires: [Questionnaire!]
+  emergencyContacts: [EmergencyContact!]
+  visitHistory: [VisitRecord!]
+}
+
+type Chair {
+  id: ID!
+  number: Int!
+  name: String!
+  status: String!
+}
+
+type StaffSchedule {
+  id: ID!
+  staffId: ID!
+  staffName: String!
+  role: String!
+  date: String!
+  startTime: String!
+  endTime: String!
+  notes: String!
+}
+
+type ReminderNotification {
+  id: ID!
+  channel: String!
+  scheduledAt: String!
+  status: String!
+  sentAt: String
+  recipient: String!
+}
+
+input UpdatePatientProfileInput {
+  id: ID!
+  gender: String
+  address: String
+  phone: String
+  email: String
+  notes: String
+}
+
+input UpsertInsuranceInput {
+  patientId: ID!
+  insurerName: String!
+  symbol: String!
+  number: String!
+  copayCategory: String!
+  validUntil: String!
+}
+
+input UpdateAppointmentInput {
+  id: ID!
+  chair: Int
+  startAt: String
+  endAt: String
+  type: String
+  staff: String
+  notes: String
+  status: String
+}
+
+input ScheduleReminderInput {
+  appointmentId: ID!
+  channel: String!
+  scheduledAt: String!
+  recipient: String!
+}
+
 type Query {
   health: Health!
   dashboard: DashboardStats!
-  patients: [Patient!]!
+  patients(page: Int = 1, pageSize: Int = 10): PatientPage!
   patient(id: ID!): Patient
-  appointments(date: String): [Appointment!]!
-  treatments(patientId: ID): [TreatmentRecord!]!
+  appointments(date: String, page: Int = 1, pageSize: Int = 10): AppointmentPage!
+  treatments(patientId: ID, page: Int = 1, pageSize: Int = 10): TreatmentPage!
   currentSession: Session!
   organization: Organization!
   teamMembers: [TeamMember!]!
   subscriptionPlans: [SubscriptionPlan!]!
   usage: UsageSummary!
   apiKeys: [ApiKey!]!
-  auditLogs(limit: Int): [AuditLogEntry!]!
+  auditLogs(page: Int = 1, pageSize: Int = 10): AuditLogPage!
+  xrayImages(patientId: ID): [XrayImage!]!
+  xrayImage(id: ID!): XrayImage
+  patientProfile(id: ID!): PatientProfile
+  searchPatients(query: String): [PatientProfile!]!
+  chairs: [Chair!]!
+  staffSchedules(date: String): [StaffSchedule!]!
+  appointmentCalendar(from: String!, to: String!): [Appointment!]!
+  noShowAppointments: [Appointment!]!
 }
 
 type Mutation {
@@ -109,6 +294,15 @@ type Mutation {
   createApiKey(input: CreateApiKeyInput!): ApiKeyCreated!
   revokeApiKey(id: ID!): Boolean!
   changePlan(tier: PlanTier!): Organization!
+  createXrayImage(input: CreateXrayImageInput!): XrayImage!
+  updateXrayImage(input: UpdateXrayImageInput!): XrayImage!
+  deleteXrayImage(id: ID!): XrayImage!
+  updatePatientProfile(input: UpdatePatientProfileInput!): PatientProfile!
+  upsertInsurance(input: UpsertInsuranceInput!): InsuranceInfo!
+  updateAppointment(input: UpdateAppointmentInput!): Appointment!
+  cancelAppointment(id: ID!, reason: String): Appointment!
+  markAppointmentNoShow(id: ID!): Appointment!
+  scheduleReminder(input: ScheduleReminderInput!): ReminderNotification!
 }
 
 enum MemberRole {
@@ -234,4 +428,44 @@ input UpdateTeamMemberRoleInput {
 
 input CreateApiKeyInput {
   name: String!
+}
+
+enum XrayImageType {
+  PANORAMIC
+  PERIAPICAL
+  BITEWING
+  CEPHALOMETRIC
+}
+
+type XrayImage {
+  id: ID!
+  patientId: ID!
+  title: String!
+  imageUrl: String!
+  imageType: XrayImageType!
+  toothRegion: String!
+  takenAt: String!
+  notes: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+input CreateXrayImageInput {
+  patientId: ID!
+  title: String!
+  imageUrl: String!
+  imageType: XrayImageType
+  toothRegion: String
+  takenAt: String
+  notes: String
+}
+
+input UpdateXrayImageInput {
+  id: ID!
+  title: String
+  imageUrl: String
+  imageType: XrayImageType
+  toothRegion: String
+  takenAt: String
+  notes: String
 }

@@ -7,30 +7,34 @@ query DashboardPage {
     chairUtilization
     noShowRate
   }
-  appointments {
-    id
-    patientId
-    patientName
-    chair
-    startAt
-    endAt
-    type
-    status
-    staff
-    notes
+  appointments(page: 1, pageSize: 50) {
+    items {
+      id
+      patientId
+      patientName
+      chair
+      startAt
+      endAt
+      type
+      status
+      staff
+      notes
+    }
   }
-  treatments {
-    id
-    patientId
-    patientName
-    visitDate
-    tooth
-    procedure
-    diagnosis
-    fee
-    staff
-    status
-    tags
+  treatments(page: 1, pageSize: 6) {
+    items {
+      id
+      patientId
+      patientName
+      visitDate
+      tooth
+      procedure
+      diagnosis
+      fee
+      staff
+      status
+      tags
+    }
   }
 }
 
