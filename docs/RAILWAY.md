@@ -162,9 +162,13 @@ graphql/**
 
 ## 4. デプロイ順序
 
-1. **API** を先にデプロイし、公開 URL を確認
-2. **Web** に `API_URL` を設定してデプロイ
+1. **API** を先にデプロイし、公開 URL を確認（`/health` の `version` が `2.1.0-pagination` 以上）
+2. **Web（dental_care）** に `API_URL` を設定してデプロイ
 3. Web の URL をブラウザで開いてダッシュボードを確認
+
+> **`Unknown argument "page"` が出る場合**  
+> Web は最新でも **api サービスが古い GraphQL スキーマ** のままです。  
+> Railway → **api** → **Redeploy**（最新 `main`）。`/health` が `1.0.0` のままなら api が未更新です。
 
 ## 5. ローカルで本番相当を試す
 

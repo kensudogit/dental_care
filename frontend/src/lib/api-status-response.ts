@@ -60,6 +60,11 @@ export async function buildApiStatusResponse(): Promise<Response> {
   }
 
   const goHealth = attempts.find((a) => a.ok)
+  const apiVersion =
+    goHealth?.body && typeof goHealth.body === 'object' && goHealth.body !== null
+      ? (goHealth.body as { version?: string }).version ?? null
+      : null
+  const apiSchemaStale = apiVersion === '1.0.0' || apiVersion === '1.0'
   const embeddedHealth = executeEmbeddedGraphQL('{ health { ok service version } }')
   const embeddedOk =
     (embeddedHealth.data?.health as { ok?: boolean } | undefined)?.ok === true
@@ -79,8 +84,16 @@ export async function buildApiStatusResponse(): Promise<Response> {
     apiUrlInvalid: isInvalidEnv(rawEnv),
     apiUrlUnresolvedTemplate: rawEnv ? isUnresolvedRailwayReference(rawEnv) : false,
     railway: Boolean(process.env.RAILWAY_PROJECT_ID),
-    hint: goHealth ? graphQLConnectionHint() : 'Using embedded GraphQL API (Go API unavailable).',
+    hint: goHealth
+      ? apiSchemaStale
+        ? 'API is reachable but on an old schema (version ' +
+          apiVersion +
+          '). Redeploy the **api** service from latest main for pagination and clinical features.'
+        : graphQLConnectionHint()
+      : 'Using embedded GraphQL API (Go API unavailable).',
     deployCommit: process.env.RAILWAY_GIT_COMMIT_SHA ?? null,
+    apiVersion,
+    apiSchemaStale,
     health: goHealth ?? {
       ok: embeddedOk,
       source: embeddedOk ? 'embedded' : 'none',

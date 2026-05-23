@@ -220,7 +220,7 @@ export function graphQLConnectionHint(): string {
     return (
       'Tried ' +
       target +
-      '. Set API_URL to api public URL or switch to unified deploy (Dockerfile).'
+      '. If you see "Unknown argument page", redeploy the **api** service from latest main.'
     )
   }
 

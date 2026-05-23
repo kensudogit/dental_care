@@ -23,7 +23,7 @@ func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, models.HealthResponse{
 		OK:      true,
 		Service: "dental-care-api",
-		Version: "1.0.0",
+		Version: "2.1.0-pagination",
 	})
 }
 
