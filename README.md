@@ -48,6 +48,7 @@ npm run dev
 ```
 
 - Web: http://localhost:3000  
+- 接続確認: http://localhost:3000/status  
 - GraphQL / GraphiQL: http://localhost:8080/graphql  
 - レガシー REST: http://localhost:8080/api/v1/...（互換用）
 

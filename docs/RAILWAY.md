@@ -98,7 +98,7 @@ Railway Dashboard → **Web サービス**（Next.js / `dental_care`）→ **Var
 
 設定後 **Web サービスを Redeploy**。
 
-**接続確認**: `https://<web>.up.railway.app/api/status` → `health.ok: true` なら成功。
+**接続確認**: `https://<web>.up.railway.app/status` → `health.ok: true` なら成功（`/api/status` も可。古いデプロイで 404 のときは `/status` を使う）。
 
 **プライベートネットワークのみ使う場合（任意）**
 
