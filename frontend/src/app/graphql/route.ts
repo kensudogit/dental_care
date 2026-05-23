@@ -34,7 +34,7 @@ async function proxy(request: Request): Promise<Response> {
       {
         errors: [
           {
-            message: `API ???????? (${apiBase}): ${detail}`,
+            message: `Cannot reach API at ${apiBase}: ${detail}`,
           },
         ],
       },
