@@ -114,6 +114,11 @@ Web イメージは **`Dockerfile`**（Root 空欄）または **`frontend/Docke
 
 `railway.toml` は **Go + Next.js 一体型**（`Dockerfile.unified`）を使います。**`API_URL` は不要**です（一体型の場合）。
 
+> **ダッシュボードに `fetch failed` / `127.0.0.1:8081` と出る場合**
+> 1. Web サービスの **Root Directory を空欄**、**Config file = `/railway.toml`**
+> 2. Railway Variables の **`API_URL` を削除**（一体型では不要。誤った値があると接続失敗します）
+> 3. 再デプロイ後、Deploy ログに `[unified] API ready` が出ることを確認
+
 ### 2サービス構成（Web のみ Next.js、`Dockerfile` 使用時）
 
 Web だけ Next.js イメージ（`Dockerfile`）にする場合は、別 API サービスと `API_URL` が必要です。

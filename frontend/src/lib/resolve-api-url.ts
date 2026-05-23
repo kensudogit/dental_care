@@ -1,7 +1,8 @@
 /**
  * Go API base URL (no trailing slash).
- * Railway: set API_URL on the Web service (dental_care), not on api.
- * Value must be the api service public URL, e.g. https://api-production-xxxx.up.railway.app
+ *
+ * Unified deploy (Dockerfile.unified): UNIFIED_DEPLOY=1, API on 127.0.0.1:8081 in same container.
+ * Two-service Railway: set API_URL on the Web service to the api public HTTPS URL.
  */
 
 function isRailway(): boolean {
@@ -10,6 +11,10 @@ function isRailway(): boolean {
       process.env.RAILWAY_PROJECT_ID ||
       process.env.RAILWAY_SERVICE_ID,
   )
+}
+
+export function isUnifiedDeploy(): boolean {
+  return process.env.UNIFIED_DEPLOY === '1' || process.env.UNIFIED_DEPLOY === 'true'
 }
 
 /** Read API URL from env (supports common Railway typos). */
@@ -42,6 +47,15 @@ function isInvalidApiUrlEnv(value: string): boolean {
   }
 }
 
+function isLocalhostApi(value: string): boolean {
+  try {
+    const u = new URL(value.startsWith('http') ? value : `http://${value}`)
+    return u.hostname === 'localhost' || u.hostname === '127.0.0.1'
+  } catch {
+    return value.includes('127.0.0.1') || value.includes('localhost')
+  }
+}
+
 function pointsToThisWebService(url: string): boolean {
   const own = process.env.RAILWAY_PUBLIC_DOMAIN?.trim()
   if (!own) return false
@@ -67,6 +81,11 @@ function normalizeApiUrl(raw: string): string {
   return `https://${trimmed}`
 }
 
+function unifiedInternalApiUrl(): string {
+  const port = process.env.API_INTERNAL_PORT?.trim() || '8081'
+  return `http://127.0.0.1:${port}`
+}
+
 function railwayInternalApiUrl(): string {
   const host =
     process.env.API_INTERNAL_HOST?.trim() ||
@@ -80,10 +99,17 @@ function railwayInternalApiUrl(): string {
 }
 
 export function resolveApiUrl(): string {
+  if (isUnifiedDeploy()) {
+    return unifiedInternalApiUrl()
+  }
+
   const explicit = readApiUrlFromEnv()
   if (explicit) {
     const normalized = normalizeApiUrl(explicit)
     if (normalized && !pointsToThisWebService(normalized)) {
+      if (isRailway() && isLocalhostApi(normalized)) {
+        return railwayInternalApiUrl()
+      }
       return normalized
     }
   }
@@ -103,12 +129,31 @@ export function graphQLConnectionHint(): string {
   const raw = readApiUrlFromEnv()
   const target = resolveApiUrl()
 
+  if (isUnifiedDeploy()) {
+    return (
+      'Unified deploy: could not reach Go API at ' +
+      target +
+      '. Check Railway deploy logs for "[unified]" messages and Go startup errors. ' +
+      'Ensure Root Directory is empty and Config file is /railway.toml (Dockerfile.unified). ' +
+      'Remove API_URL from Railway Variables if set to a public URL.'
+    )
+  }
+
+  if (raw && isLocalhostApi(raw) && isRailway()) {
+    return (
+      'API_URL points to localhost (' +
+      raw +
+      ') but this is not a unified container. Either deploy with Dockerfile.unified ' +
+      '(Root Directory empty, /railway.toml) or set API_URL to the api service public HTTPS URL.'
+    )
+  }
+
   if (raw && pointsToThisWebService(normalizeApiUrl(raw) || raw)) {
     return (
       'API_URL is set to this Web app URL (' +
       raw +
-      '). Delete it from the api service. On the dental_care (Web) service set API_URL ' +
-      'to the api service URL (e.g. https://api-production-xxxx.up.railway.app). Name must be API_URL with underscore.'
+      '). On the dental_care (Web) service set API_URL to the api service URL ' +
+      '(e.g. https://api-production-xxxx.up.railway.app). Name must be API_URL with underscore.'
     )
   }
 
@@ -138,7 +183,8 @@ export function graphQLConnectionHint(): string {
     return (
       'Tried ' +
       target +
-      '. On Web service dental_care set API_URL to api public URL (Settings -> Networking on api service).'
+      '. On Web service dental_care set API_URL to api public URL (Settings -> Networking on api service), ' +
+      'or switch to unified deploy (Dockerfile.unified).'
     )
   }
 

@@ -24,7 +24,7 @@ ENV API_URL=http://127.0.0.1:8081
 RUN npm run build:docker
 
 FROM node:22-alpine
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates curl
 WORKDIR /app
 COPY --from=go-build /server /app/server
 COPY --from=node-build /app/frontend/.next /app/frontend/.next
@@ -37,5 +37,6 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV API_INTERNAL_PORT=8081
 ENV API_URL=http://127.0.0.1:8081
+ENV UNIFIED_DEPLOY=1
 EXPOSE 3000
 CMD ["/bin/sh", "/app/start.sh"]
