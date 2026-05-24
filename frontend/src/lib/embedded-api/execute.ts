@@ -52,6 +52,18 @@ export function executeEmbeddedGraphQL(
         const result = store.paginateTreatments(undefined, variables.page as number, variables.pageSize as number)
         return { data: { treatments: result } }
       }
+      case 'PatientKartePage': {
+        const patientId = String(variables.patientId ?? '')
+        const result = store.paginateTreatments(patientId, variables.page as number, variables.pageSize as number)
+        return {
+          data: {
+            patient: store.patient(patientId),
+            treatments: result,
+          },
+        }
+      }
+      case 'TreatmentRecord':
+        return { data: { treatment: store.treatment(String(variables.id ?? '')) } }
       case 'AppointmentsPage': {
         const result = store.paginateAppointments(variables.date as string, variables.page as number, variables.pageSize as number)
         return {
@@ -106,6 +118,40 @@ export function executeEmbeddedGraphQL(
       case 'CancelAppointment':
       case 'MarkAppointmentNoShow':
       case 'ScheduleReminder':
+      case 'CreateTreatment': {
+        const input = variables.input as Record<string, unknown>
+        const created = store.createTreatment({
+          patientId: String(input.patientId ?? ''),
+          visitDate: String(input.visitDate ?? ''),
+          tooth: String(input.tooth ?? ''),
+          procedure: String(input.procedure ?? ''),
+          diagnosis: String(input.diagnosis ?? ''),
+          fee: Number(input.fee ?? 0),
+          staff: String(input.staff ?? ''),
+          status: String(input.status ?? 'completed'),
+          tags: (input.tags as string[]) ?? [],
+        })
+        return { data: { createTreatment: created } }
+      }
+      case 'UpdateTreatment': {
+        const input = variables.input as Record<string, unknown>
+        const id = String(input.id ?? '')
+        const updated = store.updateTreatment(id, {
+          visitDate: input.visitDate as string | undefined,
+          tooth: input.tooth as string | undefined,
+          procedure: input.procedure as string | undefined,
+          diagnosis: input.diagnosis as string | undefined,
+          fee: input.fee as number | undefined,
+          staff: input.staff as string | undefined,
+          status: input.status as string | undefined,
+          tags: input.tags as string[] | undefined,
+        })
+        return { data: { updateTreatment: updated } }
+      }
+      case 'DeleteTreatment': {
+        const removed = store.deleteTreatment(String(variables.id ?? ''))
+        return { data: { deleteTreatment: removed } }
+      }
       case 'CreateXrayImage':
       case 'UpdateXrayImage':
       case 'DeleteXrayImage':

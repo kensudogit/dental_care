@@ -1,17 +1,21 @@
+fragment TreatmentFields on TreatmentRecord {
+  id
+  patientId
+  patientName
+  visitDate
+  tooth
+  procedure
+  diagnosis
+  fee
+  staff
+  status
+  tags
+}
+
 query TreatmentsPage($page: Int, $pageSize: Int) {
   treatments(page: $page, pageSize: $pageSize) {
     items {
-      id
-      patientId
-      patientName
-      visitDate
-      tooth
-      procedure
-      diagnosis
-      fee
-      staff
-      status
-      tags
+      ...TreatmentFields
     }
     pageInfo {
       total
@@ -19,5 +23,50 @@ query TreatmentsPage($page: Int, $pageSize: Int) {
       pageSize
       totalPages
     }
+  }
+}
+
+query PatientKartePage($patientId: ID!, $page: Int, $pageSize: Int) {
+  patient(id: $patientId) {
+    id
+    name
+    chartNo
+    kana
+  }
+  treatments(patientId: $patientId, page: $page, pageSize: $pageSize) {
+    items {
+      ...TreatmentFields
+    }
+    pageInfo {
+      total
+      page
+      pageSize
+      totalPages
+    }
+  }
+}
+
+query TreatmentRecord($id: ID!) {
+  treatment(id: $id) {
+    ...TreatmentFields
+  }
+}
+
+mutation CreateTreatment($input: CreateTreatmentInput!) {
+  createTreatment(input: $input) {
+    ...TreatmentFields
+  }
+}
+
+mutation UpdateTreatment($input: UpdateTreatmentInput!) {
+  updateTreatment(input: $input) {
+    ...TreatmentFields
+  }
+}
+
+mutation DeleteTreatment($id: ID!) {
+  deleteTreatment(id: $id) {
+    id
+    patientId
   }
 }

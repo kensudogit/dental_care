@@ -148,6 +148,36 @@ class EmbeddedStore {
     return slicePage(filtered, page, pageSize)
   }
 
+  treatment(id: string) {
+    return this.treatments.find((t) => t.id === id) ?? null
+  }
+
+  createTreatment(input: Omit<Treatment, 'id' | 'patientName'>) {
+    const patient = this.patient(input.patientId)
+    const record: Treatment = {
+      id: `t${Date.now()}`,
+      patientName: patient?.name ?? '',
+      ...input,
+      tags: input.tags ?? [],
+    }
+    this.treatments.unshift(record)
+    return record
+  }
+
+  updateTreatment(id: string, patch: Partial<Treatment>) {
+    const idx = this.treatments.findIndex((t) => t.id === id)
+    if (idx < 0) return null
+    this.treatments[idx] = { ...this.treatments[idx], ...patch, id }
+    return this.treatments[idx]
+  }
+
+  deleteTreatment(id: string) {
+    const idx = this.treatments.findIndex((t) => t.id === id)
+    if (idx < 0) return null
+    const [removed] = this.treatments.splice(idx, 1)
+    return removed
+  }
+
   appointmentCalendar(from: string, to: string) {
     return this.appointments.filter((a) => {
       const d = a.startAt.slice(0, 10)

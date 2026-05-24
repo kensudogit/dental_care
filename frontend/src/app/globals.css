@@ -697,6 +697,12 @@ code {
 }
 
 /* ---- X-ray gallery ---- */
+#karte-form,
+#karte-list,
+.karte-panel {
+  scroll-margin-top: 1.5rem;
+}
+
 .xray-panel {
   scroll-margin-top: 1.5rem;
 }

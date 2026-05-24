@@ -109,6 +109,36 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 		},
 	})
 
+	createTreatmentInput := graphql.NewInputObject(graphql.InputObjectConfig{
+		Name: "CreateTreatmentInput",
+		Fields: graphql.InputObjectConfigFieldMap{
+			"patientId": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.ID)},
+			"visitDate": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
+			"tooth":     &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
+			"procedure": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
+			"diagnosis": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
+			"fee":       &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
+			"staff":     &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
+			"status":    &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"tags":      &graphql.InputObjectFieldConfig{Type: graphql.NewList(graphql.NewNonNull(graphql.String))},
+		},
+	})
+
+	updateTreatmentInput := graphql.NewInputObject(graphql.InputObjectConfig{
+		Name: "UpdateTreatmentInput",
+		Fields: graphql.InputObjectConfigFieldMap{
+			"id":        &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.ID)},
+			"visitDate": &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"tooth":     &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"procedure": &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"diagnosis": &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"fee":       &graphql.InputObjectFieldConfig{Type: graphql.Int},
+			"staff":     &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"status":    &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"tags":      &graphql.InputObjectFieldConfig{Type: graphql.NewList(graphql.NewNonNull(graphql.String))},
+		},
+	})
+
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",
 		Fields: mergeFields(graphql.Fields{
@@ -146,6 +176,13 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 				}),
 				Resolve: r.Treatments,
 			},
+			"treatment": &graphql.Field{
+				Type: treatmentType,
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.ID)},
+				},
+				Resolve: r.Treatment,
+			},
 		}, mergeFields(
 			saasQueryFields(r, sessionType, orgType, teamMemberType, subPlanType, usageType, apiKeyType, auditLogPageType),
 			clinicalQueryFields(r, clinicalProfileType, clinicalChairType, clinicalStaffScheduleType, appointmentType),
@@ -169,6 +206,27 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 					"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(createAppointmentInput)},
 				},
 				Resolve: r.CreateAppointment,
+			},
+			"createTreatment": &graphql.Field{
+				Type: treatmentType,
+				Args: graphql.FieldConfigArgument{
+					"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(createTreatmentInput)},
+				},
+				Resolve: r.CreateTreatment,
+			},
+			"updateTreatment": &graphql.Field{
+				Type: treatmentType,
+				Args: graphql.FieldConfigArgument{
+					"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(updateTreatmentInput)},
+				},
+				Resolve: r.UpdateTreatment,
+			},
+			"deleteTreatment": &graphql.Field{
+				Type: treatmentType,
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.ID)},
+				},
+				Resolve: r.DeleteTreatment,
 			},
 		}, mergeFields(
 			saasMutationFields(r, orgType, teamMemberType, apiKeyCreatedType, planTierEnum, updateOrgInput, inviteInput, updateRoleInput, createKeyInput),

@@ -88,6 +88,30 @@ type TreatmentRecord {
   tags: [String!]!
 }
 
+input CreateTreatmentInput {
+  patientId: ID!
+  visitDate: String!
+  tooth: String!
+  procedure: String!
+  diagnosis: String!
+  fee: Int!
+  staff: String!
+  status: String
+  tags: [String!]
+}
+
+input UpdateTreatmentInput {
+  id: ID!
+  visitDate: String
+  tooth: String
+  procedure: String
+  diagnosis: String
+  fee: Int
+  staff: String
+  status: String
+  tags: [String!]
+}
+
 type PageInfo {
   total: Int!
   page: Int!
@@ -267,6 +291,7 @@ type Query {
   patient(id: ID!): Patient
   appointments(date: String, page: Int = 1, pageSize: Int = 10): AppointmentPage!
   treatments(patientId: ID, page: Int = 1, pageSize: Int = 10): TreatmentPage!
+  treatment(id: ID!): TreatmentRecord
   currentSession: Session!
   organization: Organization!
   teamMembers: [TeamMember!]!
@@ -294,6 +319,9 @@ type Mutation {
   createApiKey(input: CreateApiKeyInput!): ApiKeyCreated!
   revokeApiKey(id: ID!): Boolean!
   changePlan(tier: PlanTier!): Organization!
+  createTreatment(input: CreateTreatmentInput!): TreatmentRecord!
+  updateTreatment(input: UpdateTreatmentInput!): TreatmentRecord!
+  deleteTreatment(id: ID!): TreatmentRecord!
   createXrayImage(input: CreateXrayImageInput!): XrayImage!
   updateXrayImage(input: UpdateXrayImageInput!): XrayImage!
   deleteXrayImage(id: ID!): XrayImage!
