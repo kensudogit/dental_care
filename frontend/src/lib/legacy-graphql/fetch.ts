@@ -17,6 +17,23 @@ const TREATMENT_FIELDS = `
   id patientId patientName visitDate tooth procedure diagnosis fee staff status tags
 `
 
+const DEFAULT_CHAIRS = [
+  { id: 'c1', number: 1, name: 'Chair 1', status: 'available' },
+  { id: 'c2', number: 2, name: 'Chair 2', status: 'available' },
+  { id: 'c3', number: 3, name: 'Chair 3', status: 'available' },
+]
+
+function enrichAppointment(raw: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...raw,
+    staffRole: raw.staffRole ?? '',
+    noShow: raw.noShow ?? false,
+    cancelReason: raw.cancelReason ?? null,
+    cancelledAt: raw.cancelledAt ?? null,
+    reminders: raw.reminders ?? [],
+  }
+}
+
 const LEGACY_QUERY: Record<string, string> = {
   DashboardPage: `
     query DashboardPageLegacy {
@@ -47,6 +64,11 @@ const LEGACY_QUERY: Record<string, string> = {
   TreatmentsPage: `
     query TreatmentsPageLegacy($patientId: ID) {
       treatments(patientId: $patientId) { ${TREATMENT_FIELDS} }
+    }
+  `,
+  AppointmentCalendarPage: `
+    query AppointmentCalendarLegacy($date: String) {
+      appointments(date: $date) { ${APPOINTMENT_FIELDS} }
     }
   `,
 }
@@ -95,6 +117,17 @@ function adaptLegacyData(name: string, data: Record<string, unknown>, variables:
       const pageSize = toInt(variables.pageSize, 10)
       return { treatments: paginateArray(items, page, pageSize) }
     }
+    case 'AppointmentCalendarPage': {
+      const items = ((data.appointments as Record<string, unknown>[]) ?? []).map(enrichAppointment)
+      return {
+        appointmentCalendar: items,
+        chairs: DEFAULT_CHAIRS,
+        staffSchedules: [],
+        noShowAppointments: items.filter(
+          (a) => a.status === 'no_show' || a.noShow === true,
+        ) as Record<string, unknown>[],
+      }
+    }
     default:
       return data
   }
@@ -133,8 +166,8 @@ export async function fetchLegacyGraphQL(
   const legacyVars =
     name === 'TreatmentsPage'
       ? { patientId: variables.patientId ?? null }
-      : name === 'AppointmentsPage'
-        ? { date: variables.date ?? null }
+      : name === 'AppointmentsPage' || name === 'AppointmentCalendarPage'
+        ? { date: variables.date ?? variables.from ?? variables.scheduleDate ?? null }
         : name === 'PatientDetail'
           ? { id: variables.id }
           : {}

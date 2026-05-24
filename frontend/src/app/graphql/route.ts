@@ -1,5 +1,5 @@
 import { executeEmbeddedGraphQL } from '@/lib/embedded-api/execute'
-import { isLegacySchemaError } from '@/lib/graphql-fallback'
+import { isUnsupportedSchemaError } from '@/lib/graphql-fallback'
 import { fetchLegacyGraphQL } from '@/lib/legacy-graphql/fetch'
 import { listApiBaseCandidates } from '@/lib/resolve-api-url'
 
@@ -45,7 +45,7 @@ async function proxy(request: Request): Promise<Response> {
       if (bodyText) {
         try {
           const parsed = JSON.parse(text) as { errors?: { message: string }[] }
-          if (isLegacySchemaError(parsed.errors)) {
+          if (isUnsupportedSchemaError(parsed.errors)) {
             const payload = JSON.parse(bodyText) as {
               query: string
               variables?: Record<string, unknown>

@@ -1,7 +1,7 @@
 import { print } from 'graphql'
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
 import { executeEmbeddedGraphQL } from '@/lib/embedded-api/execute'
-import { isLegacySchemaError } from '@/lib/graphql-fallback'
+import { isUnsupportedSchemaError } from '@/lib/graphql-fallback'
 import { fetchLegacyGraphQL } from '@/lib/legacy-graphql/fetch'
 import { listApiBaseCandidates } from '@/lib/resolve-api-url'
 
@@ -95,7 +95,7 @@ export async function gqlRequest<TResult, TVariables = Record<string, never>>(
   const json = await parseJsonBody(res)
 
   if (json.errors?.length) {
-    if (isLegacySchemaError(json.errors)) {
+    if (isUnsupportedSchemaError(json.errors)) {
       const payload = JSON.parse(body) as { query: string; variables?: Record<string, unknown> }
       const legacy = await fetchLegacyGraphQL(payload.query, payload.variables ?? {})
       if (legacy?.data && !legacy.errors?.length) {

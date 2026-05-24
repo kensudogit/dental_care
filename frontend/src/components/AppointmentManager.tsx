@@ -33,11 +33,14 @@ export function AppointmentManager({ date, initial }: Props) {
   const [message, setMessage] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
 
-  const chairs = initial.chairs.length > 0 ? initial.chairs : [
-    { id: 'c1', number: 1, name: 'Chair 1', status: 'available' },
-    { id: 'c2', number: 2, name: 'Chair 2', status: 'available' },
-    { id: 'c3', number: 3, name: 'Chair 3', status: 'available' },
-  ]
+  const chairs =
+    initial.chairs.length > 0
+      ? initial.chairs
+      : [
+          { id: 'c1', number: 1, name: 'Chair 1', status: 'available' },
+          { id: 'c2', number: 2, name: 'Chair 2', status: 'available' },
+          { id: 'c3', number: 3, name: 'Chair 3', status: 'available' },
+        ]
 
   async function runMutation(
     id: string,
@@ -59,7 +62,7 @@ export function AppointmentManager({ date, initial }: Props) {
   }
 
   async function cancelAppt(id: string) {
-    const reason = window.prompt('\u30ad\u30e3\u30f3\u30bb\u30eb\u7406\u7531\uff08\u4efb\u610f\uff09') ?? ''
+    const reason = window.prompt('Cancel reason (optional)') ?? ''
     await runMutation(id, async () => {
       const data = await gqlRequest(CancelAppointmentDocument, { id, reason: reason || undefined })
       return data.cancelAppointment
@@ -67,7 +70,7 @@ export function AppointmentManager({ date, initial }: Props) {
   }
 
   async function markNoShow(id: string) {
-    if (!window.confirm('\u30ce\u30fc\u30b7\u30e7\u30fc\u306b\u3057\u307e\u3059\u304b\uff1f')) return
+    if (!window.confirm('Mark as no-show?')) return
     await runMutation(id, async () => {
       const data = await gqlRequest(MarkAppointmentNoShowDocument, { id })
       return data.markAppointmentNoShow
@@ -84,9 +87,9 @@ export function AppointmentManager({ date, initial }: Props) {
   }
 
   async function scheduleReminder(appt: AppointmentClinicalFieldsFragment) {
-    const recipient = window.prompt('\u9001\u4fe1\u5148\uff08\u96fb\u8a71/\u30e1\u30fc\u30eb\uff09', appt.patientName ?? '') ?? ''
+    const recipient = window.prompt('Recipient (phone/email)', appt.patientName ?? '') ?? ''
     if (!recipient) return
-  const scheduledAt = `${date}T09:00:00+09:00`
+    const scheduledAt = `${date}T09:00:00+09:00`
     await runMutation(appt.id, async () => {
       await gqlRequest(ScheduleReminderDocument, {
         input: {
@@ -98,7 +101,7 @@ export function AppointmentManager({ date, initial }: Props) {
       })
       return appt
     })
-    setMessage('\u30ea\u30de\u30a4\u30f3\u30c0\u3092\u767b\u9332\u3057\u307e\u3057\u305f')
+    setMessage('Reminder scheduled')
   }
 
   const byChair = chairs.map((chair) => ({
@@ -112,14 +115,14 @@ export function AppointmentManager({ date, initial }: Props) {
     <>
       <div className="calendar-toolbar">
         <Link href={`/appointments?date=${shiftDate(date, -1)}`} className="btn ghost">
-          &larr; \u524d\u65e5
+          &larr; Prev
         </Link>
         <strong>{date}</strong>
         <Link href={`/appointments?date=${shiftDate(date, 1)}`} className="btn ghost">
-          \u6b21\u65e5 &rarr;
+          Next &rarr;
         </Link>
         <Link href="/appointments" className="btn ghost">
-          \u672c\u65e5
+          Today
         </Link>
       </div>
 
@@ -127,14 +130,14 @@ export function AppointmentManager({ date, initial }: Props) {
 
       {initial.staffSchedules.length > 0 ? (
         <section className="panel">
-          <h3>\u30b9\u30bf\u30c3\u30d5\u52e4\u52d9</h3>
+          <h3>Staff schedule</h3>
           <table className="data-table compact">
             <thead>
               <tr>
-                <th>\u540d\u524d</th>
-                <th>\u5f79\u5272</th>
-                <th>\u6642\u9593</th>
-                <th>\u5099\u8003</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Hours</th>
+                <th>Notes</th>
               </tr>
             </thead>
             <tbody>
@@ -143,9 +146,9 @@ export function AppointmentManager({ date, initial }: Props) {
                   <td>{s.staffName}</td>
                   <td>{s.role}</td>
                   <td>
-                    {s.startTime}\u2013{s.endTime}
+                    {s.startTime}-{s.endTime}
                   </td>
-                  <td>{s.notes || '\u2014'}</td>
+                  <td>{s.notes || '-'}</td>
                 </tr>
               ))}
             </tbody>
@@ -160,16 +163,17 @@ export function AppointmentManager({ date, initial }: Props) {
               {name} <span className="muted">({status})</span>
             </h3>
             {items.length === 0 ? (
-              <p className="panel-empty">\u4e88\u7d04\u306a\u3057</p>
+              <p className="panel-empty">No appointments</p>
             ) : (
               <ul className="appt-list">
                 {items.map((a) => (
                   <li key={a.id} className="appt-item">
                     <div className="appt-title">
-                      {formatTime(a.startAt)} \u2014 {a.patientName}
+                      {formatTime(a.startAt)} - {a.patientName}
                     </div>
                     <div className="appt-meta">
-                      {a.type} \u00b7 {a.staff} ({a.staffRole})
+                      {a.type} / {a.staff}
+                      {a.staffRole ? ` (${a.staffRole})` : null}
                     </div>
                     <div className="appt-badge">
                       <StatusBadge status={a.status} />
@@ -185,11 +189,11 @@ export function AppointmentManager({ date, initial }: Props) {
 
       {initial.noShowAppointments.length > 0 ? (
         <section className="panel">
-          <h3>\u904e\u53bb\u306e\u30ce\u30fc\u30b7\u30e7\u30fc</h3>
+          <h3>Past no-shows</h3>
           <ul className="appt-list">
             {initial.noShowAppointments.map((a) => (
               <li key={a.id} className="appt-item muted">
-                {a.startAt.slice(0, 10)} {formatTime(a.startAt)} \u2014 {a.patientName}
+                {a.startAt.slice(0, 10)} {formatTime(a.startAt)} - {a.patientName}
               </li>
             ))}
           </ul>
@@ -197,18 +201,18 @@ export function AppointmentManager({ date, initial }: Props) {
       ) : null}
 
       <section className="panel">
-        <h3>\u4e88\u7d04\u4e00\u89a7</h3>
+        <h3>All appointments</h3>
         <table className="data-table">
           <thead>
             <tr>
-              <th>\u958b\u59cb</th>
-              <th>\u7d42\u4e86</th>
-              <th>\u30c1\u30a7\u30a2</th>
-              <th>\u60a3\u8005</th>
-              <th>\u7a2e\u5225</th>
-              <th>\u62c5\u5f53</th>
-              <th>\u72b6\u614b</th>
-              <th>\u64cd\u4f5c</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Chair</th>
+              <th>Patient</th>
+              <th>Type</th>
+              <th>Staff</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -222,9 +226,7 @@ export function AppointmentManager({ date, initial }: Props) {
                 <td>{a.staff}</td>
                 <td>
                   <StatusBadge status={a.status} />
-                  {a.cancelReason ? (
-                    <span className="muted block">{a.cancelReason}</span>
-                  ) : null}
+                  {a.cancelReason ? <span className="muted block">{a.cancelReason}</span> : null}
                 </td>
                 <td className="action-cell">
                   <button
@@ -233,7 +235,7 @@ export function AppointmentManager({ date, initial }: Props) {
                     disabled={busyId === a.id || a.status === 'cancelled'}
                     onClick={() => confirmAppt(a.id)}
                   >
-                    \u78ba\u8a8d
+                    Confirm
                   </button>
                   <button
                     type="button"
@@ -241,7 +243,7 @@ export function AppointmentManager({ date, initial }: Props) {
                     disabled={busyId === a.id || a.status === 'cancelled'}
                     onClick={() => scheduleReminder(a)}
                   >
-                    \u30ea\u30de\u30a4\u30f3\u30c0
+                    Remind
                   </button>
                   <button
                     type="button"
@@ -257,7 +259,7 @@ export function AppointmentManager({ date, initial }: Props) {
                     disabled={busyId === a.id || a.status === 'cancelled'}
                     onClick={() => cancelAppt(a.id)}
                   >
-                    \u30ad\u30e3\u30f3\u30bb\u30eb
+                    Cancel
                   </button>
                 </td>
               </tr>
