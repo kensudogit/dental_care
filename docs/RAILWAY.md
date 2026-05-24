@@ -166,6 +166,9 @@ graphql/**
 2. **Web（dental_care）** に `API_URL` を設定してデプロイ
 3. Web の URL をブラウザで開いてダッシュボードを確認
 
+> **api サービスを削除した場合**  
+> [RAILWAY-RESTORE-API.md](./RAILWAY-RESTORE-API.md) の手順で再作成するか、Web の `API_URL` を削除して一体型で復旧してください。
+
 > **`Unknown argument "page"` が出る場合**  
 > Web は最新でも **api サービスが古い GraphQL スキーマ** のままです。  
 > Railway → **api** → **Redeploy**（最新 `main`）。`/health` が `1.0.0` のままなら api が未更新です。

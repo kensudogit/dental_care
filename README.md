@@ -104,6 +104,8 @@ Web イメージは **`Dockerfile`**（Root 空欄）または **`frontend/Docke
 
 ## Railway（本番）
 
+**api サービスを削除した場合** → [docs/RAILWAY-RESTORE-API.md](docs/RAILWAY-RESTORE-API.md) を参照してください。
+
 **Web で JSON（`dental-care-api`）だけ見える場合** → Web サービスの Root Directory が `backend` になっています。
 
 | 項目 | Web サービス（`dental_care`） |

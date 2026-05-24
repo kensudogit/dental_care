@@ -4,16 +4,32 @@ set -e
 WEB_PORT="${PORT:-3000}"
 API_PORT="${API_INTERNAL_PORT:-8081}"
 
-case "${API_URL:-}" in
-  *127.0.0.1*|*localhost*)
-    ;;
-  http://*|https://*)
-    echo "[web] external API_URL=${API_URL} — Next.js only (separate api service)"
-    unset UNIFIED_DEPLOY
-    cd /app/frontend
-    PORT="${WEB_PORT}" HOSTNAME=0.0.0.0 exec npm start
-    ;;
-esac
+# Two-service Railway: use external API_URL only when /health responds.
+external_api_healthy() {
+  case "${API_URL:-}" in
+    *127.0.0.1*|*localhost*)
+      return 1
+      ;;
+    http://*|https://*)
+      api_base="${API_URL%/}"
+      if curl -sf --max-time 8 "${api_base}/health" >/dev/null 2>&1; then
+        return 0
+      fi
+      echo "[web] external API_URL not reachable: ${api_base}/health"
+      return 1
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+if external_api_healthy; then
+  echo "[web] external API_URL=${API_URL} — Next.js only (separate api service)"
+  unset UNIFIED_DEPLOY
+  cd /app/frontend
+  PORT="${WEB_PORT}" HOSTNAME=0.0.0.0 exec npm start
+fi
 
 export API_INTERNAL_PORT="${API_PORT}"
 export API_URL="http://127.0.0.1:${API_PORT}"

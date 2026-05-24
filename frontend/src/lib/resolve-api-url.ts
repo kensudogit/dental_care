@@ -220,7 +220,8 @@ export function graphQLConnectionHint(): string {
     return (
       'Tried ' +
       target +
-      '. If you see "Unknown argument page", redeploy the **api** service from latest main.'
+      '. If the api service was deleted, recreate it (see docs/RAILWAY-RESTORE-API.md) or remove API_URL to use unified embedded API. ' +
+      'If you see "Unknown argument page", redeploy the **api** service from latest main.'
     )
   }
 
