@@ -59,6 +59,8 @@ export function executeEmbeddedGraphQL(
           data: {
             patient: store.patient(patientId),
             treatments: result,
+            xrayImages: store.xrayImages(patientId),
+            perioExams: store.perioExamsForPatient(patientId),
           },
         }
       }
@@ -125,11 +127,17 @@ export function executeEmbeddedGraphQL(
           visitDate: String(input.visitDate ?? ''),
           tooth: String(input.tooth ?? ''),
           procedure: String(input.procedure ?? ''),
+          procedureCode: String(input.procedureCode ?? ''),
           diagnosis: String(input.diagnosis ?? ''),
           fee: Number(input.fee ?? 0),
           staff: String(input.staff ?? ''),
           status: String(input.status ?? 'completed'),
           tags: (input.tags as string[]) ?? [],
+          subjective: String(input.subjective ?? ''),
+          objective: String(input.objective ?? ''),
+          assessment: String(input.assessment ?? ''),
+          plan: String(input.plan ?? ''),
+          toothChartJson: String(input.toothChartJson ?? '{"selected":[],"conditions":{}}'),
         })
         return { data: { createTreatment: created } }
       }
@@ -140,17 +148,67 @@ export function executeEmbeddedGraphQL(
           visitDate: input.visitDate as string | undefined,
           tooth: input.tooth as string | undefined,
           procedure: input.procedure as string | undefined,
+          procedureCode: input.procedureCode as string | undefined,
           diagnosis: input.diagnosis as string | undefined,
           fee: input.fee as number | undefined,
           staff: input.staff as string | undefined,
           status: input.status as string | undefined,
           tags: input.tags as string[] | undefined,
+          subjective: input.subjective as string | undefined,
+          objective: input.objective as string | undefined,
+          assessment: input.assessment as string | undefined,
+          plan: input.plan as string | undefined,
+          toothChartJson: input.toothChartJson as string | undefined,
         })
         return { data: { updateTreatment: updated } }
       }
       case 'DeleteTreatment': {
         const removed = store.deleteTreatment(String(variables.id ?? ''))
         return { data: { deleteTreatment: removed } }
+      }
+      case 'CreatePerioExam': {
+        const input = variables.input as Record<string, unknown>
+        const created = store.createPerioExam({
+          patientId: String(input.patientId ?? ''),
+          examDate: String(input.examDate ?? ''),
+          staff: String(input.staff ?? ''),
+          notes: String(input.notes ?? ''),
+          sites: (input.sites as Array<{
+            tooth: string
+            pdMesial: number
+            pdBuccal: number
+            pdDistal: number
+            pdLingual: number
+            bop: boolean
+            mobility: number
+          }>) ?? [],
+        })
+        return { data: { createPerioExam: created } }
+      }
+      case 'UpdatePerioExam': {
+        const input = variables.input as Record<string, unknown>
+        const id = String(input.id ?? '')
+        const updated = store.updatePerioExam(id, {
+          examDate: input.examDate as string | undefined,
+          staff: input.staff as string | undefined,
+          notes: input.notes as string | undefined,
+          sites: input.sites as
+            | Array<{
+                tooth: string
+                pdMesial: number
+                pdBuccal: number
+                pdDistal: number
+                pdLingual: number
+                bop: boolean
+                mobility: number
+              }>
+            | undefined,
+        })
+        return { data: { updatePerioExam: updated } }
+      }
+      case 'DeletePerioExam': {
+        const removed = store.deletePerioExam(String(variables.id ?? ''))
+        return { data: { deletePerioExam: removed } }
       }
       case 'CreateXrayImage':
       case 'UpdateXrayImage':

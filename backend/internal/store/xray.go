@@ -124,6 +124,8 @@ func ParseXrayImageType(v string) models.XrayImageType {
 		return models.XrayBitewing
 	case "CEPHALOMETRIC":
 		return models.XrayCephalometric
+	case "INTRAORAL":
+		return models.XrayIntraoral
 	default:
 		return models.XrayPanoramic
 	}

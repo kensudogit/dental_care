@@ -81,11 +81,17 @@ type TreatmentRecord {
   visitDate: String!
   tooth: String!
   procedure: String!
+  procedureCode: String!
   diagnosis: String!
   fee: Int!
   staff: String!
   status: String!
   tags: [String!]!
+  subjective: String!
+  objective: String!
+  assessment: String!
+  plan: String!
+  toothChartJson: String!
 }
 
 input CreateTreatmentInput {
@@ -93,11 +99,17 @@ input CreateTreatmentInput {
   visitDate: String!
   tooth: String!
   procedure: String!
+  procedureCode: String
   diagnosis: String!
   fee: Int!
   staff: String!
   status: String
   tags: [String!]
+  subjective: String
+  objective: String
+  assessment: String
+  plan: String
+  toothChartJson: String
 }
 
 input UpdateTreatmentInput {
@@ -105,11 +117,17 @@ input UpdateTreatmentInput {
   visitDate: String
   tooth: String
   procedure: String
+  procedureCode: String
   diagnosis: String
   fee: Int
   staff: String
   status: String
   tags: [String!]
+  subjective: String
+  objective: String
+  assessment: String
+  plan: String
+  toothChartJson: String
 }
 
 type PageInfo {
@@ -307,6 +325,8 @@ type Query {
   staffSchedules(date: String): [StaffSchedule!]!
   appointmentCalendar(from: String!, to: String!): [Appointment!]!
   noShowAppointments: [Appointment!]!
+  perioExams(patientId: ID!): [PerioExam!]!
+  perioExam(id: ID!): PerioExam
 }
 
 type Mutation {
@@ -331,6 +351,9 @@ type Mutation {
   cancelAppointment(id: ID!, reason: String): Appointment!
   markAppointmentNoShow(id: ID!): Appointment!
   scheduleReminder(input: ScheduleReminderInput!): ReminderNotification!
+  createPerioExam(input: CreatePerioExamInput!): PerioExam!
+  updatePerioExam(input: UpdatePerioExamInput!): PerioExam!
+  deletePerioExam(id: ID!): PerioExam!
 }
 
 enum MemberRole {
@@ -463,6 +486,7 @@ enum XrayImageType {
   PERIAPICAL
   BITEWING
   CEPHALOMETRIC
+  INTRAORAL
 }
 
 type XrayImage {
@@ -496,4 +520,50 @@ input UpdateXrayImageInput {
   toothRegion: String
   takenAt: String
   notes: String
+}
+
+type PerioSite {
+  tooth: String!
+  pdMesial: Int!
+  pdBuccal: Int!
+  pdDistal: Int!
+  pdLingual: Int!
+  bop: Boolean!
+  mobility: Int!
+}
+
+type PerioExam {
+  id: ID!
+  patientId: ID!
+  examDate: String!
+  staff: String!
+  notes: String!
+  sites: [PerioSite!]!
+  createdAt: String!
+}
+
+input PerioSiteInput {
+  tooth: String!
+  pdMesial: Int
+  pdBuccal: Int
+  pdDistal: Int
+  pdLingual: Int
+  bop: Boolean
+  mobility: Int
+}
+
+input CreatePerioExamInput {
+  patientId: ID!
+  examDate: String!
+  staff: String!
+  notes: String
+  sites: [PerioSiteInput!]!
+}
+
+input UpdatePerioExamInput {
+  id: ID!
+  examDate: String
+  staff: String
+  notes: String
+  sites: [PerioSiteInput!]
 }

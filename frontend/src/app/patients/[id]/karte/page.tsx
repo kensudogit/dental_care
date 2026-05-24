@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { KarteManager } from '@/components/KarteManager'
+import { ElectronicKarteManager } from '@/components/ElectronicKarteManager'
 import { PatientKartePageDocument } from '@/lib/generated/graphql'
 import { gqlRequest } from '@/lib/gql'
 
@@ -27,11 +27,13 @@ export default async function PatientKartePage({ params, searchParams }: Props) 
     if (!patient) notFound()
 
     return (
-      <KarteManager
+      <ElectronicKarteManager
         patientId={id}
         patientName={patient.name}
         chartNo={patient.chartNo}
-        initial={data.treatments.items}
+        initialTreatments={data.treatments.items}
+        initialXrays={data.xrayImages ?? []}
+        initialPerioExams={data.perioExams ?? []}
         editId={editId}
       />
     )

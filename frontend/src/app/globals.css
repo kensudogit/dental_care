@@ -1663,3 +1663,201 @@ td.action-cell > .action-links,
   border-bottom: none;
 }
 
+.page-head-actions {
+  margin-top: 0.75rem;
+}
+
+.karte-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.karte-tab {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-solid);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.karte-tab.active {
+  border-color: var(--border-strong);
+  background: var(--accent-soft);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.soap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.soap-grid textarea {
+  min-height: 4.5rem;
+  resize: vertical;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.soap-summary {
+  max-width: 12rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.tooth-chart {
+  margin: 1rem 0;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.tooth-chart-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tooth-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tooth-row-label {
+  width: 2.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.tooth-row-teeth {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.tooth-btn {
+  min-width: 2rem;
+  padding: 0.25rem 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.tooth-btn.sm {
+  min-width: 1.75rem;
+  padding: 0.15rem 0.25rem;
+}
+
+.tooth-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 700;
+}
+
+.tooth-btn.cond-caries { background: #fef3c7; }
+.tooth-btn.cond-filling { background: #dbeafe; }
+.tooth-btn.cond-crown { background: #e9d5ff; }
+.tooth-btn.cond-missing { background: #f3f4f6; color: #9ca3af; text-decoration: line-through; }
+.tooth-btn.cond-calculus { background: #ffedd5; }
+.tooth-btn.cond-perio { background: #fecdd3; }
+.tooth-btn.cond-endo { background: #ddd6fe; }
+
+.tooth-condition-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.tooth-chart-hint,
+.tooth-selected-summary {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+}
+
+.perio-panel h4 {
+  margin: 0 0 0.75rem;
+}
+
+.perio-tooth-label {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.perio-tooth-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.perio-sites-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.perio-sites-table input[type="number"] {
+  width: 3rem;
+  padding: 0.2rem;
+}
+
+.perio-history {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.perio-exam-card {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.perio-exam-card header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.perio-exam-card .bop-positive {
+  background: rgba(254, 205, 211, 0.35);
+}
+
+@media (max-width: 768px) {
+  .tooth-row-label {
+    width: 100%;
+  }
+
+  .karte-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.25rem;
+  }
+
+  .karte-tab {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+

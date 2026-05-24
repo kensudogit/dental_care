@@ -19,6 +19,7 @@ func xrayTypes() (
 			"PERIAPICAL":    &graphql.EnumValueConfig{Value: "PERIAPICAL"},
 			"BITEWING":      &graphql.EnumValueConfig{Value: "BITEWING"},
 			"CEPHALOMETRIC": &graphql.EnumValueConfig{Value: "CEPHALOMETRIC"},
+			"INTRAORAL":     &graphql.EnumValueConfig{Value: "INTRAORAL"},
 		},
 	})
 

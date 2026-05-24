@@ -34,12 +34,17 @@ export default async function PatientDetailPage({ params }: Props) {
         <div className="page-head">
           <p className="page-head-back">
             <Link href="/patients" className="back-link">
-              &larr; \u60a3\u8005\u4e00\u89a7
+              &larr; {'\u60a3\u8005\u4e00\u89a7'}
             </Link>
           </p>
           <h2>{patient.name}</h2>
           <p>
-            \u30ab\u30eb\u30c6 {patient.chartNo} \u00b7 {patient.kana}
+            {'\u30ab\u30eb\u30c6'} {patient.chartNo} {'\u00b7'} {patient.kana}
+          </p>
+          <p className="page-head-actions">
+            <Link href={`/patients/${id}/karte`} className="btn primary">
+              {'\u96fb\u5b50\u30ab\u30eb\u30c6\u3092\u958b\u304f'}
+            </Link>
           </p>
         </div>
 
@@ -48,16 +53,16 @@ export default async function PatientDetailPage({ params }: Props) {
         <XrayGallery patientId={id} initial={xrayData.xrayImages} />
 
         <section className="panel">
-          <h3>\u8a3a\u7642\u5c65\u6b74</h3>
+          <h3>{'\u8a3a\u7642\u5c65\u6b74'}</h3>
           <table className="data-table">
             <thead>
               <tr>
-                <th>\u65e5\u4ed8</th>
-                <th>\u90e8\u4f4d</th>
-                <th>\u51e6\u7f6e</th>
-                <th>\u8a3a\u65ad</th>
-                <th>\u6599\u91d1</th>
-                <th>\u72b6\u614b</th>
+                <th>{'\u65e5\u4ed8'}</th>
+                <th>{'\u90e8\u4f4d'}</th>
+                <th>{'\u51e6\u7f6e'}</th>
+                <th>{'\u8a3a\u65ad'}</th>
+                <th>{'\u6599\u91d1'}</th>
+                <th>{'\u72b6\u614b'}</th>
               </tr>
             </thead>
             <tbody>

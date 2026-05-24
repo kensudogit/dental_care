@@ -22,15 +22,21 @@ func (r *Resolver) CreateTreatment(p graphql.ResolveParams) (any, error) {
 	}
 	tags := stringSlice(in["tags"])
 	t := models.TreatmentRecord{
-		PatientID: str(in, "patientId"),
-		VisitDate: str(in, "visitDate"),
-		Tooth:     str(in, "tooth"),
-		Procedure: str(in, "procedure"),
-		Diagnosis: str(in, "diagnosis"),
-		Fee:       toInt(in["fee"]),
-		Staff:     str(in, "staff"),
-		Status:    status,
-		Tags:      tags,
+		PatientID:       str(in, "patientId"),
+		VisitDate:       str(in, "visitDate"),
+		Tooth:           str(in, "tooth"),
+		Procedure:       str(in, "procedure"),
+		ProcedureCode:   str(in, "procedureCode"),
+		Diagnosis:       str(in, "diagnosis"),
+		Fee:             toInt(in["fee"]),
+		Staff:           str(in, "staff"),
+		Status:          status,
+		Tags:            tags,
+		Subjective:      str(in, "subjective"),
+		Objective:       str(in, "objective"),
+		Assessment:      str(in, "assessment"),
+		Plan:            str(in, "plan"),
+		ToothChartJSON:  str(in, "toothChartJson"),
 	}
 	created, err := r.store.CreateTreatment(t)
 	if err != nil {
@@ -67,7 +73,31 @@ func (r *Resolver) UpdateTreatment(p graphql.ResolveParams) (any, error) {
 	if v, ok := in["tags"]; ok && v != nil {
 		patch.Tags = stringSlice(v)
 	}
-	updated, err := r.store.UpdateTreatment(id, patch)
+	clinical := false
+	if _, ok := in["subjective"]; ok {
+		clinical = true
+		patch.Subjective = str(in, "subjective")
+	}
+	if _, ok := in["objective"]; ok {
+		clinical = true
+		patch.Objective = str(in, "objective")
+	}
+	if _, ok := in["assessment"]; ok {
+		clinical = true
+		patch.Assessment = str(in, "assessment")
+	}
+	if _, ok := in["plan"]; ok {
+		clinical = true
+		patch.Plan = str(in, "plan")
+	}
+	if _, ok := in["toothChartJson"]; ok {
+		clinical = true
+		patch.ToothChartJSON = str(in, "toothChartJson")
+	}
+	if _, ok := in["procedureCode"]; ok {
+		patch.ProcedureCode = str(in, "procedureCode")
+	}
+	updated, err := r.store.UpdateTreatment(id, patch, clinical)
 	if err != nil {
 		return nil, gqlErr(err)
 	}

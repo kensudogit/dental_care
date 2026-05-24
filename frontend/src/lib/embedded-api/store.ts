@@ -38,11 +38,37 @@ type Treatment = {
   visitDate: string
   tooth: string
   procedure: string
+  procedureCode: string
   diagnosis: string
   fee: number
   staff: string
   status: string
   tags: string[]
+  subjective: string
+  objective: string
+  assessment: string
+  plan: string
+  toothChartJson: string
+}
+
+type PerioSite = {
+  tooth: string
+  pdMesial: number
+  pdBuccal: number
+  pdDistal: number
+  pdLingual: number
+  bop: boolean
+  mobility: number
+}
+
+type PerioExam = {
+  id: string
+  patientId: string
+  examDate: string
+  staff: string
+  notes: string
+  sites: PerioSite[]
+  createdAt: string
 }
 
 class EmbeddedStore {
@@ -61,6 +87,7 @@ class EmbeddedStore {
     createdAt: string
     updatedAt: string
   }> = []
+  perioExams: PerioExam[] = []
 
   auditLogs = [
     {
@@ -101,14 +128,22 @@ class EmbeddedStore {
     ]
 
     this.treatments = [
-      { id: 't1', patientId: 'p1', patientName: '\u5c71\u7530 \u592a\u90ce', visitDate: '2026-05-10', tooth: '16', procedure: '\u30b9\u30b1\u30fc\u30ea\u30f3\u30b0', diagnosis: '\u6b6f\u77f3\u6c89\u7740', fee: 3300, staff: '\u885b\u751f\u58eb \u6797', status: 'completed', tags: ['\u4e88\u9632'] },
-      { id: 't2', patientId: 'p2', patientName: '\u4f50\u85e4 \u82b1\u5b50', visitDate: '2026-05-15', tooth: '\u5168\u4f53', procedure: '\u77ef\u6b63\u8abf\u6574', diagnosis: '\u53c2\u751f', fee: 8800, staff: 'Dr. \u6728\u6751', status: 'completed', tags: ['\u77ef\u6b63'] },
-      { id: 't3', patientId: 'p3', patientName: '\u9234\u6728 \u4e00\u90ce', visitDate: '2026-04-28', tooth: '26', procedure: '\u6839\u7ba1\u6cbb\u7642', diagnosis: '\u6b6f\u9ad3\u708e', fee: 12000, staff: 'Dr. \u6728\u6751', status: 'in_progress', tags: ['\u4fdd\u5b58'] },
-      { id: 't4', patientId: 'p4', patientName: '\u7530\u4e2d \u7f8e\u54b2', visitDate: '2026-05-18', tooth: '\u5168\u4f53', procedure: 'PMTC', diagnosis: '\u8efd\u5ea6\u6b6f\u5468\u75c5', fee: 5500, staff: '\u885b\u751f\u58eb \u6797', status: 'completed', tags: ['\u4e88\u9632', '\u6b6f\u5468'] },
+      { id: 't1', patientId: 'p1', patientName: '\u5c71\u7530 \u592a\u90ce', visitDate: '2026-05-10', tooth: '16', procedure: '\u30b9\u30b1\u30fc\u30ea\u30f3\u30b0', procedureCode: 'M011', diagnosis: '\u6b6f\u77f3\u6c89\u7740', fee: 3300, staff: '\u885b\u751f\u58eb \u6797', status: 'completed', tags: ['\u4e88\u9632'], subjective: '\u6b6f\u78da\u304c\u306a\u3064\u304b\u3057\u3044', objective: '\u6b6f\u77f3\u9644\u7740', assessment: '\u6b6f\u77f3\u6c89\u7740', plan: '\u30b9\u30b1\u30fc\u30ea\u30f3\u30b0', toothChartJson: '{"selected":["16"],"conditions":{"16":"calculus"}}' },
+      { id: 't2', patientId: 'p2', patientName: '\u4f50\u85e4 \u82b1\u5b50', visitDate: '2026-05-15', tooth: '\u5168\u4f53', procedure: '\u77ef\u6b63\u8abf\u6574', procedureCode: 'M301', diagnosis: '\u53c2\u751f', fee: 8800, staff: 'Dr. \u6728\u6751', status: 'completed', tags: ['\u77ef\u6b63'], subjective: '', objective: '', assessment: '', plan: '', toothChartJson: '{"selected":[],"conditions":{}}' },
+      { id: 't3', patientId: 'p3', patientName: '\u9234\u6728 \u4e00\u90ce', visitDate: '2026-04-28', tooth: '26', procedure: '\u6839\u7ba1\u6cbb\u7642', procedureCode: 'M012', diagnosis: '\u6b6f\u9ad3\u708e', fee: 12000, staff: 'Dr. \u6728\u6751', status: 'in_progress', tags: ['\u4fdd\u5b58'], subjective: '', objective: '', assessment: '', plan: '', toothChartJson: '{"selected":["26"],"conditions":{"26":"endo"}}' },
+      { id: 't4', patientId: 'p4', patientName: '\u7530\u4e2d \u7f8e\u54b2', visitDate: '2026-05-18', tooth: '\u5168\u4f53', procedure: 'PMTC', procedureCode: 'M401', diagnosis: '\u8efd\u5ea6\u6b6f\u5468\u75c5', fee: 5500, staff: '\u885b\u751f\u58eb \u6797', status: 'completed', tags: ['\u4e88\u9632', '\u6b6f\u5468'], subjective: '', objective: '', assessment: '', plan: '', toothChartJson: '{"selected":[],"conditions":{}}' },
     ]
 
     this.xrays = [
       { id: 'x1', patientId: 'p1', title: 'Panoramic', imageUrl: '/uploads/xrays/placeholder.svg', imageType: 'PANORAMIC', toothRegion: '\u5168\u4f53', takenAt: '2026-05-10', notes: '', createdAt: created, updatedAt: created },
+      { id: 'x2', patientId: 'p1', title: '\u53e3\u8154\u5185\u7167', imageUrl: '/uploads/xrays/placeholder.svg', imageType: 'INTRAORAL', toothRegion: '16', takenAt: '2026-05-10', notes: '', createdAt: created, updatedAt: created },
+    ]
+
+    this.perioExams = [
+      {
+        id: 'pe1', patientId: 'p1', examDate: '2026-05-10', staff: '\u885b\u751f\u58eb \u6797', notes: '\u521d\u56de\u691c\u67fb', createdAt: created,
+        sites: [{ tooth: '16', pdMesial: 2, pdBuccal: 3, pdDistal: 2, pdLingual: 2, bop: true, mobility: 0 }],
+      },
     ]
   }
 
@@ -155,9 +190,15 @@ class EmbeddedStore {
   createTreatment(input: Omit<Treatment, 'id' | 'patientName'>) {
     const patient = this.patient(input.patientId)
     const record: Treatment = {
+      ...input,
       id: `t${Date.now()}`,
       patientName: patient?.name ?? '',
-      ...input,
+      procedureCode: input.procedureCode ?? '',
+      subjective: input.subjective ?? '',
+      objective: input.objective ?? '',
+      assessment: input.assessment ?? '',
+      plan: input.plan ?? '',
+      toothChartJson: input.toothChartJson ?? '{"selected":[],"conditions":{}}',
       tags: input.tags ?? [],
     }
     this.treatments.unshift(record)
@@ -230,6 +271,35 @@ class EmbeddedStore {
 
   xrayImages(patientId?: string) {
     return this.xrays.filter((x) => !patientId || x.patientId === patientId)
+  }
+
+  perioExamsForPatient(patientId: string) {
+    return this.perioExams.filter((e) => e.patientId === patientId)
+  }
+
+  createPerioExam(input: Omit<PerioExam, 'id' | 'createdAt'>) {
+    const record: PerioExam = {
+      id: `pe${Date.now()}`,
+      createdAt: isoNow(),
+      ...input,
+      sites: input.sites ?? [],
+    }
+    this.perioExams.unshift(record)
+    return record
+  }
+
+  updatePerioExam(id: string, patch: Partial<PerioExam>) {
+    const idx = this.perioExams.findIndex((e) => e.id === id)
+    if (idx < 0) return null
+    this.perioExams[idx] = { ...this.perioExams[idx], ...patch, id }
+    return this.perioExams[idx]
+  }
+
+  deletePerioExam(id: string) {
+    const idx = this.perioExams.findIndex((e) => e.id === id)
+    if (idx < 0) return null
+    const [removed] = this.perioExams.splice(idx, 1)
+    return removed
   }
 
   paginateAuditLogs(page?: number, pageSize?: number) {

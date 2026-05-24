@@ -167,10 +167,16 @@ func treatmentToMap(t models.TreatmentRecord) map[string]any {
 	if tags == nil {
 		tags = []string{}
 	}
+	toothChart := t.ToothChartJSON
+	if toothChart == "" {
+		toothChart = `{"selected":[],"conditions":{}}`
+	}
 	return map[string]any{
 		"id": t.ID, "patientId": t.PatientID, "patientName": t.PatientName,
 		"visitDate": t.VisitDate, "tooth": t.Tooth, "procedure": t.Procedure,
-		"diagnosis": t.Diagnosis, "fee": t.Fee, "staff": t.Staff,
-		"status": t.Status, "tags": tags,
+		"procedureCode": t.ProcedureCode, "diagnosis": t.Diagnosis, "fee": t.Fee,
+		"staff": t.Staff, "status": t.Status, "tags": tags,
+		"subjective": t.Subjective, "objective": t.Objective,
+		"assessment": t.Assessment, "plan": t.Plan, "toothChartJson": toothChart,
 	}
 }

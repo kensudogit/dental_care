@@ -33,6 +33,7 @@ type Store struct {
 	staffSchedules   []models.StaffSchedule
 	reminders        []models.ReminderNotification
 	xrayImages       map[string]models.XrayImage
+	perioExams       map[string]models.PerioExam
 }
 
 func New() *Store {
@@ -47,11 +48,13 @@ func New() *Store {
 		patientProfiles: make(map[string]models.PatientProfile),
 		insurance:       make(map[string]models.InsuranceInfo),
 		xrayImages:      make(map[string]models.XrayImage),
+		perioExams:      make(map[string]models.PerioExam),
 	}
 	s.seed()
 	s.seedSaas()
 	s.seedClinical()
 	s.seedXrays()
+	s.seedPerio()
 	return s
 }
 
@@ -87,10 +90,14 @@ func (s *Store) seed() {
 	}
 
 	treatments := []models.TreatmentRecord{
-		{ID: "t1", PatientID: "p1", VisitDate: "2026-05-10", Tooth: "16", Procedure: "スケーリング", Diagnosis: "歯石沈着", Fee: 3300, Staff: "衛生士 林", Status: "completed", Tags: []string{"予防"}},
-		{ID: "t2", PatientID: "p2", VisitDate: "2026-05-15", Tooth: "全体", Procedure: "矯正調整", Diagnosis: "叢生", Fee: 8800, Staff: "Dr. 木村", Status: "completed", Tags: []string{"矯正"}},
-		{ID: "t3", PatientID: "p3", VisitDate: "2026-04-28", Tooth: "26", Procedure: "根管治療", Diagnosis: "歯髄炎", Fee: 12000, Staff: "Dr. 木村", Status: "in_progress", Tags: []string{"保存"}},
-		{ID: "t4", PatientID: "p4", VisitDate: "2026-05-18", Tooth: "全体", Procedure: "PMTC", Diagnosis: "軽度歯周炎", Fee: 5500, Staff: "衛生士 林", Status: "completed", Tags: []string{"予防", "歯周"}},
+		{ID: "t1", PatientID: "p1", VisitDate: "2026-05-10", Tooth: "16", Procedure: "\u30b9\u30b1\u30fc\u30ea\u30f3\u30b0", ProcedureCode: "M011", Diagnosis: "\u6b6f\u77f3\u6c88\u7740", Fee: 3300, Staff: "\u885b\u751f\u58eb \u6797", Status: "completed", Tags: []string{"\u4e88\u9632"},
+			Subjective: "\u6b6f\u78da\u304c\u306a\u3064\u304b\u3057\u3044", Objective: "\u6b6f\u77f3\u9644\u7740\u300116\u304b\u9762\u7740\u819c\u708e", Assessment: "\u6b6f\u77f3\u6c88\u7740", Plan: "\u30b9\u30b1\u30fc\u30ea\u30f3\u30b0\u3001\u6b6f\u78da\u6307\u5c0e", ToothChartJSON: `{"selected":["16"],"conditions":{"16":"calculus"}}`},
+		{ID: "t2", PatientID: "p2", VisitDate: "2026-05-15", Tooth: "\u5168\u4f53", Procedure: "\u77ef\u6b63\u8abf\u6574", ProcedureCode: "M301", Diagnosis: "\u53e2\u751f", Fee: 8800, Staff: "Dr. \u6728\u6751", Status: "completed", Tags: []string{"\u77ef\u6b63"},
+			Subjective: "\u30ef\u30a4\u30e4\u30fc\u304c\u5f53\u305f\u308b", Objective: "\u53e2\u751f\u3001\u30c1\u30a7\u30b9\u30c8\u30a2\u30fc\u30c1\u306e\u5f53\u305f\u308a", Assessment: "\u77ef\u6b63\u4e2d", Plan: "\u30ef\u30a4\u30e4\u30fc\u4ea4\u63db\u7d99\u7d9a", ToothChartJSON: `{"selected":["11","21"],"conditions":{}}`},
+		{ID: "t3", PatientID: "p3", VisitDate: "2026-04-28", Tooth: "26", Procedure: "\u6839\u7ba1\u6cbb\u7642", ProcedureCode: "M012", Diagnosis: "\u6b6f\u9ad3\u708e", Fee: 12000, Staff: "Dr. \u6728\u6751", Status: "in_progress", Tags: []string{"\u4fdd\u5b58"},
+			Subjective: "\u51b7\u305f\u3044\u3082\u306e\u304c\u6b21\u306e\u306a\u3044", Objective: "26\u306b\u6b6f\u9ad3\u306e\u6fc0\u75db\u3001\u6df7\u6d8c\u306a\u3057", Assessment: "\u6b6f\u9ad3\u708e", Plan: "\u6839\u7ba1\u5145\u586b\u306e\u7d99\u7d9a", ToothChartJSON: `{"selected":["26"],"conditions":{"26":"endo"}}`},
+		{ID: "t4", PatientID: "p4", VisitDate: "2026-05-18", Tooth: "\u5168\u4f53", Procedure: "PMTC", ProcedureCode: "M011", Diagnosis: "\u8efd\u5ea6\u6b6f\u5468\u708e", Fee: 5500, Staff: "\u885b\u751f\u58eb \u6797", Status: "completed", Tags: []string{"\u4e88\u9632", "\u6b6f\u5468"},
+			Subjective: "\u306f\u3058\u304d\u306e\u8840\u304c\u51fa\u308b", Objective: "BOP+\u3001\u6b6f\u5468\u888b4mm", Assessment: "\u8efd\u5ea6\u6b6f\u5468\u708e", Plan: "PMTC\u3001\u6b6f\u5468\u6307\u5c0e", ToothChartJSON: `{"selected":[],"conditions":{}}`},
 	}
 	for _, t := range treatments {
 		if p, ok := s.patients[t.PatientID]; ok {

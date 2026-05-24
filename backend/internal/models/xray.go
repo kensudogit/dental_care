@@ -9,6 +9,7 @@ const (
 	XrayPeriapical     XrayImageType = "PERIAPICAL"
 	XrayBitewing       XrayImageType = "BITEWING"
 	XrayCephalometric  XrayImageType = "CEPHALOMETRIC"
+	XrayIntraoral      XrayImageType = "INTRAORAL"
 )
 
 type XrayImage struct {

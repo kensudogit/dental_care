@@ -5,11 +5,17 @@ fragment TreatmentFields on TreatmentRecord {
   visitDate
   tooth
   procedure
+  procedureCode
   diagnosis
   fee
   staff
   status
   tags
+  subjective
+  objective
+  assessment
+  plan
+  toothChartJson
 }
 
 query TreatmentsPage($page: Int, $pageSize: Int) {
@@ -43,6 +49,35 @@ query PatientKartePage($patientId: ID!, $page: Int, $pageSize: Int) {
       pageSize
       totalPages
     }
+  }
+  xrayImages(patientId: $patientId) {
+    id
+    patientId
+    title
+    imageUrl
+    imageType
+    toothRegion
+    takenAt
+    notes
+    createdAt
+    updatedAt
+  }
+  perioExams(patientId: $patientId) {
+    id
+    patientId
+    examDate
+    staff
+    notes
+    sites {
+      tooth
+      pdMesial
+      pdBuccal
+      pdDistal
+      pdLingual
+      bop
+      mobility
+    }
+    createdAt
   }
 }
 

@@ -18,6 +18,7 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 		appointmentType := clinicalTypes(r)
 
 	xrayImageType, _, createXrayInput, updateXrayInput := xrayTypes()
+	_, perioExamType, _, createPerioInput, updatePerioInput := perioTypes()
 
 	patientType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Patient",
@@ -49,7 +50,13 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 			"fee":         &graphql.Field{Type: graphql.NewNonNull(graphql.Int)},
 			"staff":       &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
 			"status":      &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-			"tags":        &graphql.Field{Type: graphql.NewList(graphql.NewNonNull(graphql.String))},
+			"tags":            &graphql.Field{Type: graphql.NewList(graphql.NewNonNull(graphql.String))},
+			"procedureCode":   &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
+			"subjective":      &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
+			"objective":       &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
+			"assessment":      &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
+			"plan":            &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
+			"toothChartJson":  &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
 		},
 	})
 
@@ -120,7 +127,13 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 			"fee":       &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 			"staff":     &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
 			"status":    &graphql.InputObjectFieldConfig{Type: graphql.String},
-			"tags":      &graphql.InputObjectFieldConfig{Type: graphql.NewList(graphql.NewNonNull(graphql.String))},
+			"tags":            &graphql.InputObjectFieldConfig{Type: graphql.NewList(graphql.NewNonNull(graphql.String))},
+			"procedureCode":   &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"subjective":      &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"objective":       &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"assessment":      &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"plan":            &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"toothChartJson":  &graphql.InputObjectFieldConfig{Type: graphql.String},
 		},
 	})
 
@@ -135,7 +148,13 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 			"fee":       &graphql.InputObjectFieldConfig{Type: graphql.Int},
 			"staff":     &graphql.InputObjectFieldConfig{Type: graphql.String},
 			"status":    &graphql.InputObjectFieldConfig{Type: graphql.String},
-			"tags":      &graphql.InputObjectFieldConfig{Type: graphql.NewList(graphql.NewNonNull(graphql.String))},
+			"tags":            &graphql.InputObjectFieldConfig{Type: graphql.NewList(graphql.NewNonNull(graphql.String))},
+			"procedureCode":   &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"subjective":      &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"objective":       &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"assessment":      &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"plan":            &graphql.InputObjectFieldConfig{Type: graphql.String},
+			"toothChartJson":  &graphql.InputObjectFieldConfig{Type: graphql.String},
 		},
 	})
 
@@ -232,6 +251,7 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 			saasMutationFields(r, orgType, teamMemberType, apiKeyCreatedType, planTierEnum, updateOrgInput, inviteInput, updateRoleInput, createKeyInput),
 			clinicalMutationFields(r, clinicalProfileType, clinicalInsuranceType, appointmentType, clinicalReminderType, updateProfileInput, upsertInsuranceInput, updateApptInput, scheduleReminderInput),
 			xrayMutationFields(r, xrayImageType, createXrayInput, updateXrayInput),
+			perioMutationFields(r, perioExamType, createPerioInput, updatePerioInput),
 		)),
 	})
 

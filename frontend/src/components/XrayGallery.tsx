@@ -19,7 +19,11 @@ const IMAGE_TYPES: { value: XrayImageType; label: string }[] = [
   { value: XrayImageType.Periapical, label: '\u30c7\u30f3\u30bf\u30eb' },
   { value: XrayImageType.Bitewing, label: '\u30d0\u30a4\u30c8\u30a6\u30a3\u30f3\u30b0' },
   { value: XrayImageType.Cephalometric, label: '\u30bb\u30d5\u30a1\u30ed' },
+  { value: XrayImageType.Intraoral, label: '\u53e3\u8154\u5185\u5199\u771f' },
 ]
+
+const XRAY_TYPES = IMAGE_TYPES.filter((t) => t.value !== XrayImageType.Intraoral)
+const INTRAORAL_TYPES = IMAGE_TYPES.filter((t) => t.value === XrayImageType.Intraoral)
 
 const typeLabel = (t: string) => IMAGE_TYPES.find((x) => x.value === t)?.label ?? t
 
@@ -31,9 +35,10 @@ type FormState = {
   notes: string
 }
 
-const emptyForm = (): FormState => ({
+const emptyForm = (mode: 'xray' | 'intraoral' | 'all' = 'xray'): FormState => ({
   title: '',
-  imageType: XrayImageType.Panoramic,
+  imageType:
+    mode === 'intraoral' ? XrayImageType.Intraoral : XrayImageType.Panoramic,
   toothRegion: '\u5168\u4f53',
   takenAt: new Date().toISOString().slice(0, 10),
   notes: '',
@@ -42,25 +47,34 @@ const emptyForm = (): FormState => ({
 export function XrayGallery({
   patientId,
   initial,
+  mode = 'all',
+  panelTitle,
 }: {
   patientId: string
   initial: Xray[]
+  mode?: 'xray' | 'intraoral' | 'all'
+  panelTitle?: string
 }) {
+  const typeOptions =
+    mode === 'intraoral' ? INTRAORAL_TYPES : mode === 'xray' ? XRAY_TYPES : IMAGE_TYPES
+  const defaultTitle =
+    panelTitle ??
+    (mode === 'intraoral' ? '\u53e3\u8154\u5185\u5199\u771f' : '\u53e3\u8154\u30ec\u30f3\u30c8\u30b2\u30f3')
   const router = useRouter()
   const [items, setItems] = useState(initial)
   const [message, setMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [editing, setEditing] = useState<Xray | null>(null)
-  const [form, setForm] = useState<FormState>(emptyForm())
+  const [form, setForm] = useState<FormState>(() => emptyForm(mode))
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
 
   const resetForm = useCallback(() => {
     setEditing(null)
-    setForm(emptyForm())
+    setForm(emptyForm(mode))
     setFile(null)
     setPreview(null)
-  }, [])
+  }, [mode])
 
   async function uploadFile(f: File): Promise<string> {
     const body = new FormData()
@@ -175,7 +189,7 @@ export function XrayGallery({
   return (
     <section id="xray" className="panel xray-panel">
       <div className="xray-panel-head">
-        <h3>{'\u53e3\u8154\u30ec\u30f3\u30c8\u30b2\u30f3'} ({items.length})</h3>
+        <h3>{defaultTitle} ({items.length})</h3>
         <p className="muted">JPEG / PNG / WebP (max 10MB)</p>
       </div>
 
@@ -196,7 +210,7 @@ export function XrayGallery({
               value={form.imageType}
               onChange={(e) => setForm({ ...form, imageType: e.target.value as XrayImageType })}
             >
-              {IMAGE_TYPES.map((t) => (
+              {typeOptions.map((t) => (
                 <option key={t.value} value={t.value}>
                   {t.label}
                 </option>

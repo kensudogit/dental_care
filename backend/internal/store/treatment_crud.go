@@ -33,11 +33,14 @@ func (s *Store) CreateTreatment(t models.TreatmentRecord) (models.TreatmentRecor
 	if t.Tags == nil {
 		t.Tags = []string{}
 	}
+	if t.ToothChartJSON == "" {
+		t.ToothChartJSON = `{"selected":[],"conditions":{}}`
+	}
 	s.treatments[t.ID] = t
 	return t, nil
 }
 
-func (s *Store) UpdateTreatment(id string, patch models.TreatmentRecord) (models.TreatmentRecord, error) {
+func (s *Store) UpdateTreatment(id string, patch models.TreatmentRecord, clinical bool) (models.TreatmentRecord, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	cur, ok := s.treatments[id]
@@ -67,6 +70,16 @@ func (s *Store) UpdateTreatment(id string, patch models.TreatmentRecord) (models
 	}
 	if patch.Tags != nil {
 		cur.Tags = patch.Tags
+	}
+	if clinical {
+		cur.Subjective = patch.Subjective
+		cur.Objective = patch.Objective
+		cur.Assessment = patch.Assessment
+		cur.Plan = patch.Plan
+		cur.ProcedureCode = patch.ProcedureCode
+		if patch.ToothChartJSON != "" {
+			cur.ToothChartJSON = patch.ToothChartJSON
+		}
 	}
 	s.treatments[id] = cur
 	return cur, nil

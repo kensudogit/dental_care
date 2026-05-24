@@ -1,0 +1,36 @@
+fragment PerioExamFields on PerioExam {
+  id
+  patientId
+  examDate
+  staff
+  notes
+  sites {
+    tooth
+    pdMesial
+    pdBuccal
+    pdDistal
+    pdLingual
+    bop
+    mobility
+  }
+  createdAt
+}
+
+mutation CreatePerioExam($input: CreatePerioExamInput!) {
+  createPerioExam(input: $input) {
+    ...PerioExamFields
+  }
+}
+
+mutation UpdatePerioExam($input: UpdatePerioExamInput!) {
+  updatePerioExam(input: $input) {
+    ...PerioExamFields
+  }
+}
+
+mutation DeletePerioExam($id: ID!) {
+  deletePerioExam(id: $id) {
+    id
+    patientId
+  }
+}

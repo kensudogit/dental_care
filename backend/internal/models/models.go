@@ -34,17 +34,23 @@ type Appointment struct {
 }
 
 type TreatmentRecord struct {
-	ID          string   `json:"id"`
-	PatientID   string   `json:"patientId"`
-	PatientName string   `json:"patientName,omitempty"`
-	VisitDate   string   `json:"visitDate"`
-	Tooth       string   `json:"tooth"`
-	Procedure   string   `json:"procedure"`
-	Diagnosis   string   `json:"diagnosis"`
-	Fee         int      `json:"fee"`
-	Staff       string   `json:"staff"`
-	Status      string   `json:"status"`
-	Tags        []string `json:"tags"`
+	ID              string   `json:"id"`
+	PatientID       string   `json:"patientId"`
+	PatientName     string   `json:"patientName,omitempty"`
+	VisitDate       string   `json:"visitDate"`
+	Tooth           string   `json:"tooth"`
+	Procedure       string   `json:"procedure"`
+	ProcedureCode   string   `json:"procedureCode"`
+	Diagnosis       string   `json:"diagnosis"`
+	Fee             int      `json:"fee"`
+	Staff           string   `json:"staff"`
+	Status          string   `json:"status"`
+	Tags            []string `json:"tags"`
+	Subjective      string   `json:"subjective"`
+	Objective       string   `json:"objective"`
+	Assessment      string   `json:"assessment"`
+	Plan            string   `json:"plan"`
+	ToothChartJSON  string   `json:"toothChartJson"`
 }
 
 type DashboardStats struct {
