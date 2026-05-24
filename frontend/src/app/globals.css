@@ -1603,7 +1603,7 @@ td.action-cell > .action-links,
 }
 
 .usage-guide-body {
-  max-height: min(60vh, 420px);
+  max-height: min(70vh, 520px);
   overflow-y: auto;
   padding: 0.9rem 0.95rem 1rem;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(244, 248, 252, 0.2) 100%);
@@ -1642,10 +1642,35 @@ td.action-cell > .action-links,
 }
 
 .usage-guide-steps p {
-  margin: 0;
+  margin: 0 0 0.35rem;
   font-size: 0.82rem;
   line-height: 1.55;
   color: var(--text);
+}
+
+.usage-guide-items {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  list-style: disc;
+}
+
+.usage-guide-items li {
+  padding: 0;
+  margin: 0.2rem 0;
+  border: none;
+  background: none;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.usage-guide-items li:hover {
+  background: none;
+  border-color: transparent;
+}
+
+.usage-guide-steps > li:has(.usage-guide-items) {
+  padding-bottom: 0.55rem;
 }
 
 .usage-guide-footer {
