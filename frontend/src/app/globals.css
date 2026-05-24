@@ -446,6 +446,12 @@ code {
   -webkit-overflow-scrolling: touch;
 }
 
+.action-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
 .treatments-table .action-cell {
   min-width: 11rem;
   white-space: nowrap;
@@ -454,6 +460,7 @@ code {
 
 .treatments-table .karte-actions {
   min-width: 11rem;
+  background: rgba(13, 148, 136, 0.04);
 }
 
 a.btn-ghost {
