@@ -306,7 +306,7 @@ func clinicalQueryFields(
 
 func clinicalMutationFields(
 	r *Resolver,
-	patientProfileType, insuranceType, appointmentType *graphql.Object,
+	patientProfileType, insuranceType, appointmentType, reminderType *graphql.Object,
 	updateProfileInput, upsertInsuranceInput, updateApptInput, scheduleReminderInput *graphql.InputObject,
 ) graphql.Fields {
 	return graphql.Fields{
@@ -347,17 +347,7 @@ func clinicalMutationFields(
 			Resolve: r.MarkAppointmentNoShow,
 		},
 		"scheduleReminder": &graphql.Field{
-			Type: graphql.NewObject(graphql.ObjectConfig{
-				Name: "ReminderNotification",
-				Fields: graphql.Fields{
-					"id":          &graphql.Field{Type: graphql.NewNonNull(graphql.ID)},
-					"channel":     &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-					"scheduledAt": &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-					"status":      &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-					"sentAt":      &graphql.Field{Type: graphql.String},
-					"recipient":   &graphql.Field{Type: graphql.NewNonNull(graphql.String)},
-				},
-			}),
+			Type: reminderType,
 			Args: graphql.FieldConfigArgument{
 				"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(scheduleReminderInput)},
 			},

@@ -13,7 +13,7 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 		updateOrgInput, inviteInput, updateRoleInput, createKeyInput := saasTypes()
 
 	clinicalProfileType, clinicalInsuranceType, _, _, _, _, _, _,
-		clinicalChairType, clinicalStaffScheduleType, _, _,
+		clinicalChairType, clinicalStaffScheduleType, clinicalReminderType, _,
 		updateProfileInput, upsertInsuranceInput, updateApptInput, scheduleReminderInput,
 		appointmentType := clinicalTypes(r)
 
@@ -230,7 +230,7 @@ func NewSchema(s *store.Store) (graphql.Schema, error) {
 			},
 		}, mergeFields(
 			saasMutationFields(r, orgType, teamMemberType, apiKeyCreatedType, planTierEnum, updateOrgInput, inviteInput, updateRoleInput, createKeyInput),
-			clinicalMutationFields(r, clinicalProfileType, clinicalInsuranceType, appointmentType, updateProfileInput, upsertInsuranceInput, updateApptInput, scheduleReminderInput),
+			clinicalMutationFields(r, clinicalProfileType, clinicalInsuranceType, appointmentType, clinicalReminderType, updateProfileInput, upsertInsuranceInput, updateApptInput, scheduleReminderInput),
 			xrayMutationFields(r, xrayImageType, createXrayInput, updateXrayInput),
 		)),
 	})
