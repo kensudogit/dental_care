@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Pagination } from '@/components/Pagination'
 import { StatusBadge } from '@/components/StatusBadge'
 import { TreatmentsPageDocument, type TreatmentsPageQuery } from '@/lib/generated/graphql'
@@ -63,6 +64,7 @@ export default async function TreatmentsPage({ searchParams }: Props) {
               <th>担当</th>
               <th>タグ</th>
               <th>状態</th>
+              <th>口腔レントゲン</th>
             </tr>
           </thead>
           <tbody>
@@ -78,6 +80,29 @@ export default async function TreatmentsPage({ searchParams }: Props) {
                 <td>{t.tags?.join(', ') ?? '—'}</td>
                 <td>
                   <StatusBadge status={t.status} />
+                </td>
+                <td className="action-cell">
+                  <Link
+                    href={`/patients/${t.patientId}#xray-form`}
+                    className="btn ghost sm"
+                    title={`${t.patientName ?? t.patientId} のレントゲンを登録`}
+                  >
+                    登録
+                  </Link>
+                  <Link
+                    href={`/patients/${t.patientId}#xray-list`}
+                    className="btn ghost sm"
+                    title={`${t.patientName ?? t.patientId} のレントゲンを修正`}
+                  >
+                    修正
+                  </Link>
+                  <Link
+                    href={`/patients/${t.patientId}#xray-list`}
+                    className="btn ghost sm danger"
+                    title={`${t.patientName ?? t.patientId} のレントゲンを削除`}
+                  >
+                    削除
+                  </Link>
                 </td>
               </tr>
             ))}

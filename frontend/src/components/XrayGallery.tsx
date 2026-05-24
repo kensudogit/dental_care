@@ -173,13 +173,13 @@ export function XrayGallery({
   }
 
   return (
-    <section className="panel xray-panel">
+    <section id="xray" className="panel xray-panel">
       <div className="xray-panel-head">
         <h3>{'\u53e3\u8154\u30ec\u30f3\u30c8\u30b2\u30f3'} ({items.length})</h3>
         <p className="muted">JPEG / PNG / WebP (max 10MB)</p>
       </div>
 
-      <form className="saas-form xray-form" onSubmit={onSubmit}>
+      <form id="xray-form" className="saas-form xray-form" onSubmit={onSubmit}>
         <h4>{editing ? '\u5199\u771f\u3092\u66f4\u65b0' : '\u65b0\u898f\u767b\u9332'}</h4>
         <div className="form-row">
           <label>
@@ -256,7 +256,7 @@ export function XrayGallery({
       {items.length === 0 ? (
         <p className="panel-empty">No x-ray images</p>
       ) : (
-        <div className="xray-grid">
+        <div id="xray-list" className="xray-grid">
           {items.map((x) => (
             <article key={x.id} className="xray-card">
               <div className="xray-thumb">
