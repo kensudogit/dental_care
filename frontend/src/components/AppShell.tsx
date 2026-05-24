@@ -11,6 +11,7 @@ import {
   IconSettings,
 } from './NavIcons'
 import { PlanBadge } from './PlanBadge'
+import { UsageGuidePanel } from './UsageGuidePanel'
 
 const nav = [
   { href: '/', label: 'Dashboard', Icon: IconDashboard },
@@ -102,6 +103,7 @@ export function AppShell({
           </div>
         </header>
         <main className="main-content">{children}</main>
+        <UsageGuidePanel />
       </div>
     </div>
   )
