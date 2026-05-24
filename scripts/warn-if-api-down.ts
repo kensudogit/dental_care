@@ -4,7 +4,7 @@ try {
   const res = await fetch(`${base}/health`, { signal: AbortSignal.timeout(2500) })
   if (res.ok) process.exit(0)
 } catch {
-  // not running
+  // API not running
 }
 
 console.warn('')

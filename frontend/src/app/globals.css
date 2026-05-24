@@ -436,8 +436,42 @@ code {
 
 .data-table {
   width: 100%;
+  min-width: 960px;
   border-collapse: collapse;
   font-size: 0.9rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.treatments-table .action-cell {
+  min-width: 11rem;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.treatments-table .karte-actions {
+  min-width: 11rem;
+}
+
+a.btn-ghost {
+  text-decoration: none;
+  color: var(--text);
+  display: inline-block;
+}
+
+.btn-ghost.sm,
+a.btn-ghost.sm {
+  padding: 0.2rem 0.45rem;
+  font-size: 0.75rem;
+}
+
+.btn-ghost.sm.danger,
+a.btn-ghost.sm.danger {
+  color: #b91c1c;
+  border-color: #fecaca;
 }
 
 .data-table th,

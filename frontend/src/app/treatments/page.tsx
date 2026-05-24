@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { Pagination } from '@/components/Pagination'
+import { KarteActionLinks, XrayActionLinks } from '@/components/TreatmentActionLinks'
 import { StatusBadge } from '@/components/StatusBadge'
 import { TreatmentsPageDocument, type TreatmentsPageQuery } from '@/lib/generated/graphql'
 import { formatYen, gqlRequest } from '@/lib/gql'
@@ -52,7 +52,8 @@ export default async function TreatmentsPage({ searchParams }: Props) {
       </section>
 
       <section className="panel">
-        <table className="data-table">
+        <div className="table-scroll">
+        <table className="data-table treatments-table">
           <thead>
             <tr>
               <th>来院日</th>
@@ -83,55 +84,23 @@ export default async function TreatmentsPage({ searchParams }: Props) {
                   <StatusBadge status={t.status} />
                 </td>
                 <td className="action-cell">
-                  <Link
-                    href={`/patients/${t.patientId}#xray-form`}
-                    className="btn ghost sm"
-                    title={`${t.patientName ?? t.patientId} のレントゲンを登録`}
-                  >
-                    登録
-                  </Link>
-                  <Link
-                    href={`/patients/${t.patientId}#xray-list`}
-                    className="btn ghost sm"
-                    title={`${t.patientName ?? t.patientId} のレントゲンを修正`}
-                  >
-                    修正
-                  </Link>
-                  <Link
-                    href={`/patients/${t.patientId}#xray-list`}
-                    className="btn ghost sm danger"
-                    title={`${t.patientName ?? t.patientId} のレントゲンを削除`}
-                  >
-                    削除
-                  </Link>
+                  <XrayActionLinks
+                    patientId={t.patientId}
+                    patientLabel={t.patientName ?? t.patientId}
+                  />
                 </td>
-                <td className="action-cell">
-                  <Link
-                    href={`/patients/${t.patientId}/karte#karte-form`}
-                    className="btn ghost sm"
-                    title={`${t.patientName ?? t.patientId} のカルテを登録`}
-                  >
-                    登録
-                  </Link>
-                  <Link
-                    href={`/patients/${t.patientId}/karte?edit=${t.id}#karte-form`}
-                    className="btn ghost sm"
-                    title={`${t.patientName ?? t.patientId} のカルテを修正`}
-                  >
-                    修正
-                  </Link>
-                  <Link
-                    href={`/patients/${t.patientId}/karte#karte-list`}
-                    className="btn ghost sm danger"
-                    title={`${t.patientName ?? t.patientId} のカルテを削除`}
-                  >
-                    削除
-                  </Link>
+                <td className="action-cell karte-actions">
+                  <KarteActionLinks
+                    patientId={t.patientId}
+                    patientLabel={t.patientName ?? t.patientId}
+                    treatmentId={t.id}
+                  />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
         <Pagination
           basePath="/treatments"
           page={pageInfo.page}
