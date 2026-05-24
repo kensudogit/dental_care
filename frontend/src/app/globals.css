@@ -452,15 +452,29 @@ code {
   gap: 0.25rem;
 }
 
-.treatments-table .action-cell {
+.treatments-table td.action-cell,
+.treatments-table td.karte-actions {
+  display: table-cell;
   min-width: 11rem;
+  width: 11rem;
   white-space: nowrap;
   vertical-align: middle;
 }
 
-.treatments-table .karte-actions {
-  min-width: 11rem;
+.treatments-table td.karte-actions {
   background: rgba(13, 148, 136, 0.04);
+}
+
+.treatments-table td.action-cell .action-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.treatments-table .col-actions {
+  width: 11rem;
+  min-width: 11rem;
 }
 
 a.btn-ghost {
@@ -983,10 +997,17 @@ a.btn-ghost.sm.danger {
   flex-wrap: wrap;
 }
 
-.action-cell {
+td.action-cell {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+td.action-cell > .action-links,
+.action-cell-flex {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
+  align-items: center;
 }
 
 .btn.sm {

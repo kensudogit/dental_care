@@ -308,22 +308,24 @@ export function KarteManager({ patientId, patientName, chartNo, initial, editId 
                     <StatusBadge status={t.status} />
                   </td>
                   <td className="action-cell">
-                    <button
-                      type="button"
-                      className="btn ghost sm"
-                      disabled={loading}
-                      onClick={() => startEdit(t)}
-                    >
-                      {'\u4fee\u6b63'}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn ghost sm danger"
-                      disabled={loading}
-                      onClick={() => onDelete(t)}
-                    >
-                      {'\u524a\u9664'}
-                    </button>
+                    <div className="action-links">
+                      <button
+                        type="button"
+                        className="btn ghost sm"
+                        disabled={loading}
+                        onClick={() => startEdit(t)}
+                      >
+                        {'\u4fee\u6b63'}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn ghost sm danger"
+                        disabled={loading}
+                        onClick={() => onDelete(t)}
+                      >
+                        {'\u524a\u9664'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -229,38 +229,40 @@ export function AppointmentManager({ date, initial }: Props) {
                   {a.cancelReason ? <span className="muted block">{a.cancelReason}</span> : null}
                 </td>
                 <td className="action-cell">
-                  <button
-                    type="button"
-                    className="btn ghost sm"
-                    disabled={busyId === a.id || a.status === 'cancelled'}
-                    onClick={() => confirmAppt(a.id)}
-                  >
-                    Confirm
-                  </button>
-                  <button
-                    type="button"
-                    className="btn ghost sm"
-                    disabled={busyId === a.id || a.status === 'cancelled'}
-                    onClick={() => scheduleReminder(a)}
-                  >
-                    Remind
-                  </button>
-                  <button
-                    type="button"
-                    className="btn ghost sm"
-                    disabled={busyId === a.id || a.status === 'cancelled'}
-                    onClick={() => markNoShow(a.id)}
-                  >
-                    NS
-                  </button>
-                  <button
-                    type="button"
-                    className="btn ghost sm danger"
-                    disabled={busyId === a.id || a.status === 'cancelled'}
-                    onClick={() => cancelAppt(a.id)}
-                  >
-                    Cancel
-                  </button>
+                  <div className="action-links">
+                    <button
+                      type="button"
+                      className="btn ghost sm"
+                      disabled={busyId === a.id || a.status === 'cancelled'}
+                      onClick={() => confirmAppt(a.id)}
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      type="button"
+                      className="btn ghost sm"
+                      disabled={busyId === a.id || a.status === 'cancelled'}
+                      onClick={() => scheduleReminder(a)}
+                    >
+                      Remind
+                    </button>
+                    <button
+                      type="button"
+                      className="btn ghost sm"
+                      disabled={busyId === a.id || a.status === 'cancelled'}
+                      onClick={() => markNoShow(a.id)}
+                    >
+                      NS
+                    </button>
+                    <button
+                      type="button"
+                      className="btn ghost sm danger"
+                      disabled={busyId === a.id || a.status === 'cancelled'}
+                      onClick={() => cancelAppt(a.id)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

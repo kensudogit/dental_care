@@ -54,6 +54,19 @@ export default async function TreatmentsPage({ searchParams }: Props) {
       <section className="panel">
         <div className="table-scroll">
         <table className="data-table treatments-table">
+          <colgroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col className="col-actions" />
+            <col className="col-actions" />
+          </colgroup>
           <thead>
             <tr>
               <th>来院日</th>
