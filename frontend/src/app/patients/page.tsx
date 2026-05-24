@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Pagination } from '@/components/Pagination'
+import { PhoneLink } from '@/components/PhoneLink'
 import { PatientsPageDocument, type PatientsPageQuery } from '@/lib/generated/graphql'
 import { gqlRequest } from '@/lib/gql'
 import { parsePageParams } from '@/lib/pagination'
@@ -59,7 +60,7 @@ export default async function PatientsPage({ searchParams }: Props) {
                 </td>
                 <td>{p.name}</td>
                 <td>{p.kana}</td>
-                <td>{p.phone}</td>
+                <td><PhoneLink phone={p.phone} /></td>
                 <td>{p.allergies || '—'}</td>
                 <td>{p.lastVisit}</td>
               </tr>

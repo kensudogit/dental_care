@@ -533,6 +533,18 @@ a.btn-ghost.sm.danger {
   color: var(--accent-2);
 }
 
+.phone-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.phone-link:hover {
+  color: var(--accent-2);
+  text-decoration: underline;
+}
+
 /* ---- Badges ---- */
 .badge {
   display: inline-flex;

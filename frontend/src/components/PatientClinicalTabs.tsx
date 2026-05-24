@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { PhoneLink } from '@/components/PhoneLink'
 import { StatusBadge } from '@/components/StatusBadge'
 import {
   UpdatePatientProfileDocument,
@@ -263,7 +264,7 @@ export function PatientClinicalTabs({ initial }: { initial: Profile }) {
                 <tr key={m.id}>
                   <td>{m.name}</td>
                   <td>{m.relationship}</td>
-                  <td>{m.phone}</td>
+                  <td><PhoneLink phone={m.phone} /></td>
                 </tr>
               ))}
             </tbody>
@@ -283,7 +284,7 @@ export function PatientClinicalTabs({ initial }: { initial: Profile }) {
                 <tr key={c.id}>
                   <td>{c.name}</td>
                   <td>{c.relationship}</td>
-                  <td>{c.phone}</td>
+                  <td><PhoneLink phone={c.phone} /></td>
                   <td>{c.priority}</td>
                 </tr>
               ))}
