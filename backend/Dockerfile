@@ -9,6 +9,6 @@ FROM alpine:3.20
 RUN apk add --no-cache ca-certificates
 COPY --from=build /server /server
 ENV PORT=8080
-ENV APP_BUILD_ID=api-v4-reminder-type-fix
+ENV APP_BUILD_ID=api-v5-saas-enum-fix
 EXPOSE 8080
 CMD ["/server"]

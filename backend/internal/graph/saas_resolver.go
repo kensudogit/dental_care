@@ -10,7 +10,7 @@ func (r *Resolver) CurrentSession(p graphql.ResolveParams) (any, error) {
 	return map[string]any{
 		"user":         userToMap(s.User),
 		"organization": orgToMap(s.Organization, r.storeMemberCount()),
-		"role":         string(s.Role),
+		"role":         s.Role,
 	}, nil
 }
 

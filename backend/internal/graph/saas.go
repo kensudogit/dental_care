@@ -273,7 +273,7 @@ func userToMap(u models.User) map[string]any {
 func orgToMap(o models.Organization, memberCount int) map[string]any {
 	return map[string]any{
 		"id": o.ID, "name": o.Name, "slug": o.Slug,
-		"planTier": string(o.PlanTier), "subscriptionStatus": string(o.SubscriptionStatus),
+		"planTier": o.PlanTier, "subscriptionStatus": o.SubscriptionStatus,
 		"chairCount": o.ChairCount, "timezone": o.Timezone,
 		"memberCount": memberCount, "createdAt": o.CreatedAt.Format(time.RFC3339),
 	}
@@ -282,7 +282,7 @@ func orgToMap(o models.Organization, memberCount int) map[string]any {
 func teamMemberToMap(r *Resolver, m models.TeamMember) map[string]any {
 	u, _ := r.store.GetUser(m.UserID)
 	return map[string]any{
-		"id": m.ID, "user": userToMap(u), "role": string(m.Role),
+		"id": m.ID, "user": userToMap(u), "role": m.Role,
 		"joinedAt": m.JoinedAt.Format(time.RFC3339),
 		"lastActiveAt": m.LastActiveAt.Format(time.RFC3339),
 	}
